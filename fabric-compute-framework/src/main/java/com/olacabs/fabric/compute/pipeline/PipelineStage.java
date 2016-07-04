@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016 ANI Technologies Pvt. Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.olacabs.fabric.compute.pipeline;
 
 import com.codahale.metrics.annotation.Timed;
@@ -5,19 +21,18 @@ import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.WaitStrategies;
 import com.olacabs.fabric.compute.EventCollector;
+import com.olacabs.fabric.compute.ProcessingContext;
 import com.olacabs.fabric.compute.comms.CommsMessageHandler;
 import com.olacabs.fabric.compute.processor.InitializationException;
 import com.olacabs.fabric.compute.processor.ProcessingException;
 import com.olacabs.fabric.compute.processor.ProcessorBase;
-import com.olacabs.fabric.compute.ProcessingContext;
 import com.olacabs.fabric.compute.util.ComponentPropertyReader;
+import com.olacabs.fabric.model.common.ComponentMetadata;
 import com.olacabs.fabric.model.event.Event;
 import com.olacabs.fabric.model.event.EventSet;
-import com.olacabs.fabric.model.common.ComponentMetadata;
 import io.astefanutti.metrics.aspectj.Metrics;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,22 +61,22 @@ public class PipelineStage implements CommsMessageHandler<PipelineMessage>, Mess
     private final NotificationBus notificationBus;
     private final ProcessingContext context;
     private final Retryer<PipelineMessage> retryer = RetryerBuilder.<PipelineMessage>newBuilder()
-            .retryIfException()
-            .retryIfRuntimeException()
-            .withWaitStrategy(WaitStrategies.fibonacciWait(30, TimeUnit.SECONDS))
-            .build();
+        .retryIfException()
+        .retryIfRuntimeException()
+        .withWaitStrategy(WaitStrategies.fibonacciWait(30, TimeUnit.SECONDS))
+        .build();
 
 
     private ClockPulseGenerator clockPulseGenerator;
 
     @Builder
     public PipelineStage(
-                         String instanceId,
-                         Properties properties,
-                         ComponentMetadata processorMetadata,
-                         ProcessorBase processor,
-                         NotificationBus notificationBus,
-                         ProcessingContext context) {
+        String instanceId,
+        Properties properties,
+        ComponentMetadata processorMetadata,
+        ProcessorBase processor,
+        NotificationBus notificationBus,
+        ProcessingContext context) {
         this.instanceId = instanceId;
         this.properties = properties;
         this.processorMetadata = processorMetadata;
@@ -77,13 +92,13 @@ public class PipelineStage implements CommsMessageHandler<PipelineMessage>, Mess
 
     public void initialize(Properties globalProperties) throws InitializationException {
         final Long triggeringFrequency = ComponentPropertyReader.readLong(properties, globalProperties,
-                                                        "triggering_frequency", instanceId, getProcessorMetadata());
-        if(null != triggeringFrequency) {
+            "triggering_frequency", instanceId, getProcessorMetadata());
+        if (null != triggeringFrequency) {
             clockPulseGenerator = ClockPulseGenerator.builder()
-                    .id(id)
-                    .notificationBus(notificationBus)
-                    .notificationPeriod(triggeringFrequency)
-                    .build();
+                .id(id)
+                .notificationBus(notificationBus)
+                .notificationPeriod(triggeringFrequency)
+                .build();
         }
         processor.initialize(instanceId, globalProperties, properties, processorMetadata);
     }
@@ -93,13 +108,13 @@ public class PipelineStage implements CommsMessageHandler<PipelineMessage>, Mess
     }
 
     public void start() {
-        if(null != clockPulseGenerator) {
+        if (null != clockPulseGenerator) {
             clockPulseGenerator.start();
         }
     }
 
     public void stop() {
-        if(null != clockPulseGenerator) {
+        if (null != clockPulseGenerator) {
             clockPulseGenerator.stop();
         }
         processor.destroy();
@@ -131,17 +146,17 @@ public class PipelineStage implements CommsMessageHandler<PipelineMessage>, Mess
                 try {
                     List<Event> events = processor.timeTriggerHandler(context);
                     EventSet eventSet = EventSet.eventFromEventBuilder()
-                            .isAggregate(true)
-                            .events(events)
-                            .build();
+                        .isAggregate(true)
+                        .events(events)
+                        .build();
                     eventSet.setId(idGenerator.transactionId());
                     notificationBus.publish(
-                            PipelineMessage.userspaceMessageBuilder()
-                                    .messages(eventSet)
-                                    .build(),
-                            id);
+                        PipelineMessage.userspaceMessageBuilder()
+                            .messages(eventSet)
+                            .build(),
+                        id);
                     logger.debug("[{}][{}] Scheduled processing completed.", processorMetadata.getName(),
-                            processor.getId());
+                        processor.getId());
                     return null;
                 } catch (Throwable t) {
                     logger.error("<timeTriggerHandler()> called on [{}][{}] threw exception: ", processor.getId(), t);
@@ -149,12 +164,12 @@ public class PipelineStage implements CommsMessageHandler<PipelineMessage>, Mess
                 }
             });
         } catch (Exception e) {
-            if(e.getCause() != null) {
+            if (e.getCause() != null) {
                 logger.error("[{}][{}] error executing timeTriggerHandler()", processorMetadata.getName(),
-                        processor.getId(), e.getCause());
+                    processor.getId(), e.getCause());
             } else {
                 logger.error("[{}][{}] error executing timeTriggerHandler()", processorMetadata.getName(),
-                        processor.getId(), e);
+                    processor.getId(), e);
             }
         }
     }
@@ -169,37 +184,36 @@ public class PipelineStage implements CommsMessageHandler<PipelineMessage>, Mess
                     processor.process(context, eventCollector, pipelineMessage.getMessages());
                 } catch (Throwable t) {
                     logger.error("<consume()> called on [{}][{}] threw exception: ", processorMetadata.getName(),
-                            processor.getId(), t);
+                        processor.getId(), t);
                     throw t;
                 }
                 logger.debug("[{}][{}][{}] Processing completed for message.", processorMetadata.getName(),
-                        processor.getId(), pipelineMessage.getMessages().getId());
-                if(null != eventCollector.getEvents()) {
-                    if(pipelineMessage.getMessages().getId() != eventCollector.getEvents().getId()) {
+                    processor.getId(), pipelineMessage.getMessages().getId());
+                if (null != eventCollector.getEvents()) {
+                    if (pipelineMessage.getMessages().getId() != eventCollector.getEvents().getId()) {
                         eventCollector.getEvents().setId(idGenerator.transactionId());
                         eventCollector.getEvents().setTransactionId(pipelineMessage.getMessages().getTransactionId());
                         return PipelineMessage.userspaceMessageBuilder()
-                                .messages(eventCollector.getEvents())
-                                .parent(pipelineMessage)
-                                .build();
+                            .messages(eventCollector.getEvents())
+                            .parent(pipelineMessage)
+                            .build();
                     }
                 }
                 return null;
             });
-            if(null != generatedMessage) {
+            if (null != generatedMessage) {
                 messageToSend = generatedMessage;
                 logger.debug("[{}][{}] Setting message to newly generated message: {}",
-                                processorMetadata.getName(), pipelineMessage.getMessages().getId(),
-                                generatedMessage.getMessages().getId());
+                    processorMetadata.getName(), pipelineMessage.getMessages().getId(),
+                    generatedMessage.getMessages().getId());
             }
         } catch (Exception e) {
-            if(e.getCause() != null) {
+            if (e.getCause() != null) {
                 logger.error(String.format("[%s][%s][%d] error executing handleUserMessage()",
-                                    processorMetadata.getName(), processor.getId(), pipelineMessage.getMessages().getId()), e.getCause());
-            }
-            else {
+                    processorMetadata.getName(), processor.getId(), pipelineMessage.getMessages().getId()), e.getCause());
+            } else {
                 logger.error(String.format("[%s][%s][%d] error executing handleUserMessage()",
-                                    processorMetadata.getName(), processor.getId(), pipelineMessage.getMessages().getId()), e);
+                    processorMetadata.getName(), processor.getId(), pipelineMessage.getMessages().getId()), e);
             }
         } finally {
             notificationBus.publish(messageToSend, id, !processor.isScheduled());

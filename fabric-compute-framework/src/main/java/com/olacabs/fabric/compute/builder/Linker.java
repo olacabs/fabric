@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016 ANI Technologies Pvt. Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.olacabs.fabric.compute.builder;
 
 import com.codahale.metrics.MetricRegistry;
@@ -5,24 +21,20 @@ import com.codahale.metrics.SharedMetricRegistries;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import com.olacabs.fabric.compute.ProcessingContext;
 import com.olacabs.fabric.compute.pipeline.ComputationPipeline;
 import com.olacabs.fabric.compute.pipeline.NotificationBus;
 import com.olacabs.fabric.compute.pipeline.PipelineStage;
 import com.olacabs.fabric.compute.processor.ProcessorBase;
+import com.olacabs.fabric.compute.source.PipelineSource;
 import com.olacabs.fabric.compute.source.PipelineStreamSource;
 import com.olacabs.fabric.model.common.ComponentMetadata;
 import com.olacabs.fabric.model.computation.ComputationSpec;
-import com.olacabs.fabric.compute.ProcessingContext;
-import com.olacabs.fabric.compute.source.PipelineSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by santanu.s on 19/09/15.
@@ -30,7 +42,7 @@ import java.util.Set;
 public class Linker {
     private static final Logger logger = LoggerFactory.getLogger(Linker.class);
 
-    private static final String DEFAULT_REGISTRY_NAME="metrics-registry";
+    private static final String DEFAULT_REGISTRY_NAME = "metrics-registry";
 
     private final Loader loader;
     private MetricRegistry metricRegistry;
@@ -38,6 +50,7 @@ public class Linker {
     public Linker(Loader loader) {
         this(loader, SharedMetricRegistries.getOrCreate(DEFAULT_REGISTRY_NAME));
     }
+
     public Linker(Loader loader, MetricRegistry metricRegistry) {
         this.loader = loader;
         this.metricRegistry = metricRegistry;
@@ -59,7 +72,7 @@ public class Linker {
             final ComponentMetadata meta = sourceMetadata.getMeta();
             PipelineSource source = null;
             final String errorMessage = String.format("Source object not loaded properly [%s:%s:%s]",
-                    meta.getNamespace(), meta.getName(), meta.getVersion());
+                meta.getNamespace(), meta.getName(), meta.getVersion());
             try {
                 PipelineSource sourceCopy = loader.loadSource(meta);
                 if (sourceCopy != null) {
@@ -70,17 +83,17 @@ public class Linker {
             }
             Preconditions.checkNotNull(source, errorMessage);
             logger.info("Loaded source: {}:{}:{}",
-                    meta.getNamespace(), meta.getName(), meta.getVersion());
+                meta.getNamespace(), meta.getName(), meta.getVersion());
             PipelineStreamSource sourceStage = PipelineStreamSource.builder()
-                            .instanceId(sourceMetadata.getId())
-                            .properties(sourceMetadata.getProperties())
-                            .notificationBus(notificationBus)
-                            .sourceMetadata(sourceMetadata.getMeta())
-                            .source(source)
-                            .processingContext(processingContext)
-                            .objectMapper(objectMapper)
-                            .registry(metricRegistry)
-                            .build();
+                .instanceId(sourceMetadata.getId())
+                .properties(sourceMetadata.getProperties())
+                .notificationBus(notificationBus)
+                .sourceMetadata(sourceMetadata.getMeta())
+                .source(source)
+                .processingContext(processingContext)
+                .objectMapper(objectMapper)
+                .registry(metricRegistry)
+                .build();
             pipeline.addSource(sourceStage);
             sources.put(sourceMetadata.getId(), sourceStage);
         });
@@ -88,7 +101,7 @@ public class Linker {
             final ComponentMetadata meta = processorMetadata.getMeta();
             ProcessorBase processorBase = null;
             final String errorMessage = String.format("Processor object not loaded properly [%s:%s:%s]",
-                    meta.getNamespace(), meta.getName(), meta.getVersion());
+                meta.getNamespace(), meta.getName(), meta.getVersion());
             try {
                 ProcessorBase processorBaseCopy = loader.loadProcessor(meta);
                 if (processorBaseCopy != null) {
@@ -99,16 +112,16 @@ public class Linker {
             }
             Preconditions.checkNotNull(processorBase, errorMessage);
             logger.info("Loaded processor: {}:{}:{}",
-                    meta.getNamespace(), meta.getName(), meta.getVersion());
+                meta.getNamespace(), meta.getName(), meta.getVersion());
 
             PipelineStage stage = PipelineStage.builder()
-                    .instanceId(processorMetadata.getId())
-                    .properties(processorMetadata.getProperties())
-                    .notificationBus(notificationBus)
-                    .processorMetadata(processorMetadata.getMeta())
-                    .processor(processorBase)
-                    .context(processingContext)
-                    .build();
+                .instanceId(processorMetadata.getId())
+                .properties(processorMetadata.getProperties())
+                .notificationBus(notificationBus)
+                .processorMetadata(processorMetadata.getMeta())
+                .processor(processorBase)
+                .context(processingContext)
+                .build();
             pipeline.addPipelineStage(stage);
             stages.put(processorMetadata.getId(), stage);
         });

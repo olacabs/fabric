@@ -17,12 +17,11 @@ import java.util.Random;
 import static org.mockito.Mockito.*;
 
 
-
 /**
  * Created by syed.kather on 07/12/15.
  */
 public class KafkaWriterTest {
-    
+
     private KafkaWriter processor;
     private kafka.javaapi.producer.Producer<String, String> producer;
 
@@ -40,32 +39,25 @@ public class KafkaWriterTest {
 
     @Test
     public void testConsume() throws Exception {
-        Random rnd=new Random();
-        ObjectMapper mapper=new ObjectMapper();
-        List<String> lst= Lists.newArrayList();
-        for(int i=0;i<5;i++) {
+        Random rnd = new Random();
+        ObjectMapper mapper = new ObjectMapper();
+        List<String> lst = Lists.newArrayList();
+        for (int i = 0; i < 5; i++) {
             lst.add("{\"firstName\":\"" + "xyz" + rnd.nextInt(10) + "\", \"lastName\":\"Doe" + rnd.nextInt(100) + "\"}");
 
         }
 
         ProcessorTestBench processorTestBench = new ProcessorTestBench(false);
         List<EventSet> events = processorTestBench.runStreamingProcessor(processor, ImmutableList.of(EventSet.eventFromEventBuilder()
-                .events(ImmutableList.of(Event.builder().jsonNode(mapper.readTree(lst.get(0))).build(), Event.builder().jsonNode(mapper.readTree(lst.get(0))).build()))
-                .build(), EventSet.eventFromEventBuilder().events(ImmutableList
-                .of(Event.builder().jsonNode(mapper.readTree(lst.get(0))).build(), Event.builder().jsonNode(mapper.readTree(lst.get(0))).build(),
-                        Event.builder().jsonNode(mapper.readTree(lst.get(0))).build())).build()));
+            .events(ImmutableList.of(Event.builder().jsonNode(mapper.readTree(lst.get(0))).build(), Event.builder().jsonNode(mapper.readTree(lst.get(0))).build()))
+            .build(), EventSet.eventFromEventBuilder().events(ImmutableList
+            .of(Event.builder().jsonNode(mapper.readTree(lst.get(0))).build(), Event.builder().jsonNode(mapper.readTree(lst.get(0))).build(),
+                Event.builder().jsonNode(mapper.readTree(lst.get(0))).build())).build()));
 
-        verify(producer,times(2)).send(anyList());
-
-
-
-
+        verify(producer, times(2)).send(anyList());
 
 
     }
-
-
-
 
 
 }

@@ -1,6 +1,21 @@
+/*
+ * Copyright 2016 ANI Technologies Pvt. Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.olacabs.fabric.compute.builder.impl;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import org.apache.http.Header;
 import org.apache.http.HeaderElement;
@@ -44,8 +59,8 @@ public class HttpFileDownloader {
         cm.setMaxTotal(20);
 
         httpClient = HttpClients.custom()
-                .setConnectionManager(cm)
-                .build();
+            .setConnectionManager(cm)
+            .build();
     }
 
     public Path download(final String url) {
@@ -53,29 +68,29 @@ public class HttpFileDownloader {
         CloseableHttpResponse response = null;
         try {
             response = httpClient.execute(httpGet);
-            if(HttpStatus.SC_OK != response.getStatusLine().getStatusCode()) {
+            if (HttpStatus.SC_OK != response.getStatusLine().getStatusCode()) {
                 throw new RuntimeException(
-                        String.format("Server returned [%d][%s] for url: %s",
-                                response.getStatusLine().getStatusCode(),
-                                response.getStatusLine().getReasonPhrase(),
-                                url));
+                    String.format("Server returned [%d][%s] for url: %s",
+                        response.getStatusLine().getStatusCode(),
+                        response.getStatusLine().getReasonPhrase(),
+                        url));
             }
             Header[] headers = response.getHeaders("Content-Disposition");
             String filename = null;
-            if(null != headers) {
-                for(Header header : headers) {
-                    for(HeaderElement headerElement : header.getElements()) {
-                        if(!headerElement.getName().equalsIgnoreCase("attachment")) {
+            if (null != headers) {
+                for (Header header : headers) {
+                    for (HeaderElement headerElement : header.getElements()) {
+                        if (!headerElement.getName().equalsIgnoreCase("attachment")) {
                             continue;
                         }
                         NameValuePair attachment = headerElement.getParameterByName("filename");
-                        if(attachment != null) {
+                        if (attachment != null) {
                             filename = attachment.getValue();
                         }
                     }
                 }
             }
-            if(Strings.isNullOrEmpty(filename)) {
+            if (Strings.isNullOrEmpty(filename)) {
                 String[] nameParts = url.split("/");
                 filename = nameParts[nameParts.length - 1];
             }
@@ -83,7 +98,7 @@ public class HttpFileDownloader {
         } catch (IOException e) {
             throw new RuntimeException("Error loading class from: " + url, e);
         } finally {
-            if(null != response) {
+            if (null != response) {
                 try {
                     response.close();
                 } catch (IOException e) {

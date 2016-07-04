@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016 ANI Technologies Pvt. Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.olacabs.fabric.compute;
 
 import com.codahale.metrics.*;
@@ -31,16 +47,15 @@ public class PipelineTestBench {
 
     /**
      * A constructor for getting an instance of {@code PipelineTestBench}
-     *
      */
     public PipelineTestBench() {
         metricRegistry = SharedMetricRegistries.getOrCreate("metrics-registry");
         metricRegistry.timer("consume-timer");
         reporter = ConsoleReporter.forRegistry(metricRegistry)
-                .convertDurationsTo(TimeUnit.MILLISECONDS)
-                .convertRatesTo(TimeUnit.SECONDS)
-                .filter(MetricFilter.ALL)
-                .build();
+            .convertDurationsTo(TimeUnit.MILLISECONDS)
+            .convertRatesTo(TimeUnit.SECONDS)
+            .filter(MetricFilter.ALL)
+            .build();
     }
 
     /**
@@ -50,15 +65,15 @@ public class PipelineTestBench {
      */
     public PipelineTestBench(String dirPath) {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(dirPath),
-                "Provide a non-null and non-empty filePath");
+            "Provide a non-null and non-empty filePath");
         File dir = new File(dirPath);
         Preconditions.checkArgument(dir.exists() || dir.mkdirs(), "Provide a directory path which either exists or can be created");
         metricRegistry = SharedMetricRegistries.getOrCreate("metrics-registry");
         reporter = CsvReporter.forRegistry(metricRegistry)
-                .convertRatesTo(TimeUnit.SECONDS)
-                .convertDurationsTo(TimeUnit.MILLISECONDS)
-                .filter(MetricFilter.ALL)
-                .build(dir);
+            .convertRatesTo(TimeUnit.SECONDS)
+            .convertDurationsTo(TimeUnit.MILLISECONDS)
+            .filter(MetricFilter.ALL)
+            .build(dir);
     }
 
     private void startReporter() {

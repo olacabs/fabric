@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016 ANI Technologies Pvt. Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.olacabs.fabric.compute.source;
 
 import com.codahale.metrics.Histogram;
@@ -10,11 +26,11 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.WaitStrategies;
 import com.google.common.collect.Maps;
 import com.olacabs.fabric.common.util.PropertyReader;
-import com.olacabs.fabric.compute.pipeline.*;
 import com.olacabs.fabric.compute.ProcessingContext;
+import com.olacabs.fabric.compute.pipeline.*;
+import com.olacabs.fabric.model.common.ComponentMetadata;
 import com.olacabs.fabric.model.event.EventSet;
 import com.olacabs.fabric.model.event.RawEventBundle;
-import com.olacabs.fabric.model.common.ComponentMetadata;
 import io.astefanutti.metrics.aspectj.Metrics;
 import lombok.Builder;
 import lombok.Getter;
@@ -52,10 +68,10 @@ public class PipelineStreamSource implements MessageSource {
     private final Histogram batchSizeHistogram;
 
     private final Retryer<PipelineMessage> retryer = RetryerBuilder.<PipelineMessage>newBuilder()
-            .retryIfException()
-            .retryIfRuntimeException()
-            .withWaitStrategy(WaitStrategies.fibonacciWait(30, TimeUnit.SECONDS))
-            .build();
+        .retryIfException()
+        .retryIfRuntimeException()
+        .withWaitStrategy(WaitStrategies.fibonacciWait(30, TimeUnit.SECONDS))
+        .build();
 
     private LinkedBlockingQueue<EventSet> delivered;
     private ConcurrentMap<Long, EventSet> messages;
@@ -64,14 +80,14 @@ public class PipelineStreamSource implements MessageSource {
 
     @Builder
     public PipelineStreamSource(
-            final String instanceId,
-            Properties properties,
-            NotificationBus notificationBus,
-            ComponentMetadata sourceMetadata,
-            PipelineSource source,
-            ProcessingContext processingContext,
-            ObjectMapper objectMapper,
-            MetricRegistry registry) {
+        final String instanceId,
+        Properties properties,
+        NotificationBus notificationBus,
+        ComponentMetadata sourceMetadata,
+        PipelineSource source,
+        ProcessingContext processingContext,
+        ObjectMapper objectMapper,
+        MetricRegistry registry) {
         this.instanceId = instanceId;
         this.properties = properties;
         this.notificationBus = notificationBus;
@@ -117,24 +133,24 @@ public class PipelineStreamSource implements MessageSource {
             logger.error("[{}] There are no unacked message!! This is impossible!!", sourceMetadata.getName());
             return;
         }
-        if(minMessage.getId() != eventSet.getId()) {
+        if (minMessage.getId() != eventSet.getId()) {
             logger.error("[{}] Got an out of bound message. Acceptable: {} Got: {}",
-                    sourceMetadata.getName(), minMessage.getId(), eventSet.getId());
+                sourceMetadata.getName(), minMessage.getId(), eventSet.getId());
             return;
         }
         minMessage = delivered.poll();
         logger.debug("Acked messageset: {} Partition id: {}", minMessage.getId(), minMessage.getPartitionId());
         messages.remove(eventSet.getId());
         source.ack(RawEventBundle.builder()
-                .events(minMessage.getEvents())
-                .partitionId(minMessage.getPartitionId())
-                .transactionId(eventSet.getTransactionId())
-                .meta(minMessage.getMeta())
-                .build());
+            .events(minMessage.getEvents())
+            .partitionId(minMessage.getPartitionId())
+            .transactionId(eventSet.getTransactionId())
+            .meta(minMessage.getMeta())
+            .build());
     }
 
     public void start() {
-         generatorFuture = executorService.submit(() -> {
+        generatorFuture = executorService.submit(() -> {
             try {
                 generateMessage();
             } catch (Exception e) {
@@ -176,21 +192,21 @@ public class PipelineStreamSource implements MessageSource {
                     }
                 });
                 EventSet eventSet = EventSet.eventFromSourceBuilder()
-                        .id(transactionIdGenerator.transactionId())
-                        .sourceId(communicationId())
-                        .transactionId(eventBundle.getTransactionId())
-                        .meta(eventBundle.getMeta())
-                        .events(eventBundle.getEvents())
-                        .partitionId(eventBundle.getPartitionId())
-                        .build();
+                    .id(transactionIdGenerator.transactionId())
+                    .sourceId(communicationId())
+                    .transactionId(eventBundle.getTransactionId())
+                    .meta(eventBundle.getMeta())
+                    .events(eventBundle.getEvents())
+                    .partitionId(eventBundle.getPartitionId())
+                    .build();
                 batchSizeHistogram.update(eventBundle.getEvents().size());
                 messages.put(eventSet.getId(), eventSet);
                 delivered.put(eventSet);
                 notificationBus.publish(
-                        PipelineMessage.userspaceMessageBuilder()
-                                .messages(eventSet)
-                                .build(),
-                        id);
+                    PipelineMessage.userspaceMessageBuilder()
+                        .messages(eventSet)
+                        .build(),
+                    id);
 
             } catch (Exception e) {
                 logger.error("Blocked exception while reading message: ", e);

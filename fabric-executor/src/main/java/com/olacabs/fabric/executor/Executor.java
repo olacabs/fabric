@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016 ANI Technologies Pvt. Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.olacabs.fabric.executor;
 
 import com.codahale.metrics.ConsoleReporter;
@@ -44,7 +60,7 @@ public class Executor {
     private static final Logger logger = LoggerFactory.getLogger(Executor.class);
 
     static {
-        java.security.Security.setProperty("networkaddress.cache.ttl" , "60");
+        java.security.Security.setProperty("networkaddress.cache.ttl", "60");
     }
 
     private final MesosDnsResolver dnsResolver;
@@ -62,14 +78,22 @@ public class Executor {
         dnsResolver = new MesosDnsResolver();
     }
 
+    public static void main(String[] args) throws Exception {
+        try {
+            new Executor().run(args);
+        } catch (Throwable t) {
+            logger.error("Executor will exit...", t);
+        }
+    }
+
     public void startMonitor(final ComputationPipeline pipeline) {
         healthcheckMonitor = Undertow.builder()
             .addHttpListener(8080, "0.0.0.0")
             .setHandler(exchange -> {
                     boolean result = pipeline.healthcheck();
                     exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
-                    exchange.setStatusCode(result ? HttpStatus.SC_OK: HttpStatus.SC_INTERNAL_SERVER_ERROR);
-                    exchange.getResponseSender().send(result ? "alive": "dead");
+                    exchange.setStatusCode(result ? HttpStatus.SC_OK : HttpStatus.SC_INTERNAL_SERVER_ERROR);
+                    exchange.getResponseSender().send(result ? "alive" : "dead");
                 }
             ).build();
         healthcheckMonitor.start();
@@ -106,7 +130,7 @@ public class Executor {
         CommandLineParser commandLineParser = new DefaultParser();
         CommandLine commandLine = commandLineParser.parse(options, args);
 
-        if(commandLine.hasOption("h")) {
+        if (commandLine.hasOption("h")) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("fabric-executor", options);
             return;
@@ -186,13 +210,13 @@ public class Executor {
             metricsDisabled = Boolean.valueOf(commandLine.getOptionValue("d"));
         }
 
-        if(!metricsDisabled) {
+        if (!metricsDisabled) {
             registry.register("gc", new GarbageCollectorMetricSet());
             registry.register("memory", new MemoryUsageGaugeSet());
             registry.register("threads", new ThreadStatesGaugeSet());
             registry.register("fd", new FileDescriptorRatioGauge());
             if (!Strings.isNullOrEmpty(graphiteHost)) {
-                long interval = (null != System.getenv("GRAPHITE_REPORTER_INTERVAL")) ? Long.valueOf(System.getenv("GRAPHITE_REPORTER_INTERVAL")): 60L;
+                long interval = (null != System.getenv("GRAPHITE_REPORTER_INTERVAL")) ? Long.valueOf(System.getenv("GRAPHITE_REPORTER_INTERVAL")) : 60L;
                 String specUrl = specPath(commandLine);
                 String[] tokens = specUrl.split("/");
                 String tenant = tokens[tokens.length - 2];
@@ -203,7 +227,7 @@ public class Executor {
                     .build(new GraphiteUDP(graphiteHost, graphitePort))
                     .start(interval, TimeUnit.SECONDS);
             } else if (!Strings.isNullOrEmpty(opentsdbHost)) {
-                long interval = (null != System.getenv("OPENTSDB_REPORTER_INTERVAL")) ? Long.valueOf(System.getenv("OPENTSDB_REPORTER_INTERVAL")): 60L;
+                long interval = (null != System.getenv("OPENTSDB_REPORTER_INTERVAL")) ? Long.valueOf(System.getenv("OPENTSDB_REPORTER_INTERVAL")) : 60L;
                 OpenTsdbReporter.forRegistry(registry)
                     .prefixedWith(spec.getName())
                     .convertRatesTo(TimeUnit.SECONDS)
@@ -242,31 +266,23 @@ public class Executor {
     }
 
     private MetadataSource metadataSource(CommandLine commandLine) {
-        if(commandLine.hasOption("s")) {
+        if (commandLine.hasOption("s")) {
             return new HttpMetadataSource(objectMapper, dnsResolver);
         }
 
-        if(commandLine.hasOption("f")) {
+        if (commandLine.hasOption("f")) {
             return new FileMetadataSource(objectMapper);
         }
         throw new IllegalArgumentException("No spec source defined. Use either -s or -f");
     }
 
     private String specPath(CommandLine commandLine) {
-        if(commandLine.hasOption("s")) {
+        if (commandLine.hasOption("s")) {
             return commandLine.getOptionValue("s");
         }
-        if(commandLine.hasOption("f")) {
+        if (commandLine.hasOption("f")) {
             return commandLine.getOptionValue("f");
         }
         throw new IllegalArgumentException("No spec source defined. Use either -s or -f");
-    }
-
-    public static void main(String[] args) throws Exception {
-        try {
-            new Executor().run(args);
-        } catch (Throwable t) {
-            logger.error("Executor will exit...", t);
-        }
     }
 }

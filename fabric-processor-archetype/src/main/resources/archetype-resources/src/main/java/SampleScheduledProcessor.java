@@ -9,15 +9,13 @@ import com.olacabs.fabric.compute.processor.ProcessingException;
 import com.olacabs.fabric.compute.processor.ScheduledProcessor;
 import com.olacabs.fabric.compute.util.ComponentPropertyReader;
 import com.olacabs.fabric.model.common.ComponentMetadata;
+import com.olacabs.fabric.model.event.Event;
 import com.olacabs.fabric.model.event.EventSet;
 import com.olacabs.fabric.model.processor.Processor;
 import com.olacabs.fabric.model.processor.ProcessorType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
-
-import com.olacabs.fabric.model.event.Event;
-import com.olacabs.fabric.common.Document;
 
 import java.io.IOException;
 import java.util.List;
@@ -31,10 +29,10 @@ import java.util.Properties;
 @Slf4j
 @Data
 @Processor(namespace = "global",
-        name = "${artifactId}", version = "0.0.1-SNAPSHOT", description = "Skeleton Timed Processor",
-        cpu = 0.1, memory = 512, processorType = ProcessorType.TIMER_DRIVEN,
-        requiredProperties = {"sampleSenderName", "sampleBool", "sampleInt"},
-        optionalProperties = {"sampleOptionalProp"}
+    name = "${artifactId}", version = "0.0.1-SNAPSHOT", description = "Skeleton Timed Processor",
+    cpu = 0.1, memory = 512, processorType = ProcessorType.TIMER_DRIVEN,
+    requiredProperties = {"sampleSenderName", "sampleBool", "sampleInt"},
+    optionalProperties = {"sampleOptionalProp"}
 )
 public class SampleScheduledProcessor extends ScheduledProcessor {
 
