@@ -15,6 +15,7 @@
     <modules>
         <module>kafka-source</module>
         <module>kafka-writer</module>
+        <module>http-writer</module>
     </modules>
 
 

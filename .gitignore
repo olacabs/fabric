@@ -40,3 +40,7 @@
 */dependency-reduced-pom.xml
 
 .DS_Store
+
+#Target folders#
+##########################
+*target*
