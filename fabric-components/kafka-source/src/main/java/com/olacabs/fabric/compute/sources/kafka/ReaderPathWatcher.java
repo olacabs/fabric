@@ -25,9 +25,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 
-/**
- * Created by santanu.s on 12/10/15.
- */
 public class ReaderPathWatcher implements PathChildrenCacheListener {
     private static final Logger logger = LoggerFactory.getLogger(ReaderPathWatcher.class);
 

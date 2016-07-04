@@ -19,10 +19,6 @@ package com.olacabs.fabric.compute.tracking;
 import org.junit.Assert;
 import org.junit.Test;
 
-
-/**
- * Created by santanu.s on 11/09/15.
- */
 public class SimpleBitSetTest {
     private int numBits = 256;
     private SimpleBitSet bitSet = new SimpleBitSet(numBits);

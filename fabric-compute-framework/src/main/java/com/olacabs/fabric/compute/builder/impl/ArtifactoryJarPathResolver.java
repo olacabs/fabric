@@ -31,9 +31,6 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Set;
 
-/**
- * Created by santanu.s on 02/10/15.
- */
 public class ArtifactoryJarPathResolver {
     private static final Logger logger = LoggerFactory.getLogger(ArtifactoryJarPathResolver.class);
 

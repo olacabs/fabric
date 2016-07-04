@@ -32,10 +32,6 @@ import java.util.Random;
 
 import static org.mockito.Mockito.*;
 
-
-/**
- * Created by syed.kather on 07/12/15.
- */
 public class KafkaWriterTest {
 
     private KafkaWriter processor;

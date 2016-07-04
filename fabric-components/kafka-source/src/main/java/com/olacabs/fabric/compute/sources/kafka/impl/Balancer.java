@@ -31,10 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
-/**
- * Created by santanu.s on 07/10/15.
- */
-
 public class Balancer {
     private static final Logger logger = LoggerFactory.getLogger(Balancer.class);
 

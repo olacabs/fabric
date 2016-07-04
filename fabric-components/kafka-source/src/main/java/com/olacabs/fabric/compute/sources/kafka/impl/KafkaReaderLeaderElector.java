@@ -41,9 +41,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-/**
- * Created by santanu.s on 14/10/15.
- */
 public class KafkaReaderLeaderElector implements LeaderSelectorListener {
     private static final Logger logger = LoggerFactory.getLogger(KafkaReaderLeaderElector.class);
 

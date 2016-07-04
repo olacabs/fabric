@@ -32,9 +32,6 @@ import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * Created by santanu.s on 12/09/15.
- */
 public class ForkedComputationPipelineTest {
 
     @Test

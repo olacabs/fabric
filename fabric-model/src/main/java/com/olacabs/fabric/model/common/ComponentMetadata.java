@@ -25,9 +25,6 @@ import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by santanu.s on 09/09/15.
- */
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

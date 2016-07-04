@@ -26,9 +26,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Created by santanu.s on 09/09/15.
- */
 public abstract class StreamingProcessor extends ProcessorBase {
     private static final Logger logger = LoggerFactory.getLogger(StreamingProcessor.class);
 

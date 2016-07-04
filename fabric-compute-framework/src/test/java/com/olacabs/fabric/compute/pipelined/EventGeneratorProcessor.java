@@ -27,9 +27,6 @@ import com.olacabs.fabric.model.event.EventSet;
 import java.util.Collections;
 import java.util.Properties;
 
-/**
- * Created by santanu.s on 10/12/15.
- */
 public class EventGeneratorProcessor extends StreamingProcessor {
     @Override
     protected EventSet consume(ProcessingContext context, EventSet eventSet) throws ProcessingException {

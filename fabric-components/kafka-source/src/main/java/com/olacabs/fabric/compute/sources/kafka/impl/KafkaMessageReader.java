@@ -41,9 +41,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-/**
- * Created by santanu.s on 07/10/15.
- */
 public class KafkaMessageReader implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(KafkaMessageReader.class);
     private static final int DEFAULT_TIME_TO_WAIT = 30000;

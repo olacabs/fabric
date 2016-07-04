@@ -42,9 +42,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
-/**
- * Created by syed.abdul.kather on 25/11/15.
- */
 @Processor(
     namespace = "global",
     name = "kafka-writer",

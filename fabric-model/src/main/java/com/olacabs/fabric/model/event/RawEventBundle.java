@@ -23,9 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by santanu.s on 20/09/15.
- */
 @Builder
 @Data
 public class RawEventBundle {

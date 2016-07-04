@@ -43,6 +43,7 @@ public class NotificationBus {
     private Map<Integer, Connection> connections = Maps.newHashMap();
     private Map<Integer, Communicator> comms = Maps.newHashMap();
     private Map<Integer, PipelineStreamSource> sources = Maps.newHashMap();
+
     public NotificationBus(final Properties properties) {
         this.properties = properties;
         logger.info("Notification bus created...");

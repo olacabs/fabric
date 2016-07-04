@@ -32,9 +32,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 
-/**
- * Created by santanu.s on 12/09/15.
- */
 @Slf4j
 @Builder
 @NoArgsConstructor

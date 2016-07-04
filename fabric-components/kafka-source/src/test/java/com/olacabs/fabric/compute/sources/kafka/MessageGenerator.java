@@ -22,10 +22,6 @@ import kafka.producer.ProducerConfig;
 
 import java.util.Properties;
 
-
-/**
- * Created by santanu.s on 02/11/15.
- */
 public class MessageGenerator {
 
     public static void main(String[] args) throws Exception {

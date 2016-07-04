@@ -36,9 +36,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-/**
- * Created by santanu.s on 19/09/15.
- */
 public class Linker {
     private static final Logger logger = LoggerFactory.getLogger(Linker.class);
 

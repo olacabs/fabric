@@ -23,9 +23,6 @@ import com.olacabs.fabric.model.computation.ComputationSpec;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-/**
- * Created by santanu.s on 20/11/15.
- */
 public class FileMetadataSource implements MetadataSource {
     private final ObjectMapper objectMapper;
 

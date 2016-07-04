@@ -37,9 +37,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by santanu.s on 07/10/15.
- */
 public class KafkaMetadataClient {
     private final static Logger logger = LoggerFactory.getLogger(KafkaMetadataClient.class);
     private static final int BUFFER_SIZE = 1_048_576; //1MB

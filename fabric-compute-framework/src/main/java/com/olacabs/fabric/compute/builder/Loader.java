@@ -20,9 +20,6 @@ import com.olacabs.fabric.compute.processor.ProcessorBase;
 import com.olacabs.fabric.compute.source.PipelineSource;
 import com.olacabs.fabric.model.common.ComponentMetadata;
 
-/**
- * Created by santanu.s on 19/09/15.
- */
 public interface Loader {
     PipelineSource loadSource(ComponentMetadata source);
 

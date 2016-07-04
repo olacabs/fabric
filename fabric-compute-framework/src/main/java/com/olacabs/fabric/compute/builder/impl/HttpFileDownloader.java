@@ -40,9 +40,6 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Set;
 
-/**
- * Created by santanu.s on 22/09/15.
- */
 public class HttpFileDownloader {
     private static final Logger logger = LoggerFactory.getLogger(HttpFileDownloader.class);
 

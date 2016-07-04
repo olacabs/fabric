@@ -28,9 +28,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
-/**
- * Created by santanu.s on 10/09/15.
- */
 public class SummingProcessor extends ScheduledProcessor {
     private long count = 0L;
 

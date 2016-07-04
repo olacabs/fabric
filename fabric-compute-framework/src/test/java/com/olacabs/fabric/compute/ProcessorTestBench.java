@@ -32,9 +32,6 @@ import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * Created by santanu.s on 23/09/15.
- */
 @Slf4j
 public class ProcessorTestBench {
     private ScheduledReporter reporter;

@@ -23,9 +23,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by santanu.s on 11/09/15.
- */
 public class ClockPulseGenerator {
     private final int id;
     private final long notificationPeriod;

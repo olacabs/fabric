@@ -32,9 +32,6 @@ import java.util.List;
 import java.util.Queue;
 import java.util.stream.Collectors;
 
-/**
- * Created by santanu.s on 12/12/15.
- */
 public class TransactionManager {
     private static final Logger logger = LoggerFactory.getLogger(TransactionManager.class);
 

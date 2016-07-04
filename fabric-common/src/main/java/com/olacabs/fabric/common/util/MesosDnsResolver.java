@@ -24,9 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
-/**
- * Created by santanu.s on 20/11/15.
- */
 @Slf4j
 public class MesosDnsResolver {
     private final DnsReporter dnsReporter;

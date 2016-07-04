@@ -33,9 +33,6 @@ import org.slf4j.LoggerFactory;
 import java.net.InetAddress;
 import java.util.List;
 
-/**
- * Created by santanu.s on 22/09/15.
- */
 public class HttpMetadataSource implements MetadataSource {
     private static final Logger logger = LoggerFactory.getLogger(HttpMetadataSource.class);
     private final ObjectMapper mapper;

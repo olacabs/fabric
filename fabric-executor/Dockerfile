@@ -30,5 +30,5 @@ RUN ln -sf /dev/stdout /var/log/fabric-executor/stdout.log
 
 RUN ln -sf /dev/stderr /var/log/fabric-executor/stderr.log
 
-CMD ["sh", "-c", "java -Xmx${HEAP_SIZE} -Xms${HEAP_SIZE} -Dfile.encoding=utf-8 ${JVM_OPTS} -jar fabric-executor.jar -d ${METRICS_DISABLED} --spec ${SPEC_LOCATION} -g ${GRAPHITE_URL}"]
+CMD ["sh", "-c", "java -Xmx${HEAP_SIZE} -Xms${HEAP_SIZE} -Dfile.encoding=utf-8 ${JVM_OPTS} -jar fabric-executor.jar -d ${METRICS_DISABLED} --spec ${SPEC_LOCATION} -m ${OPENTSDB_URL}"]
 

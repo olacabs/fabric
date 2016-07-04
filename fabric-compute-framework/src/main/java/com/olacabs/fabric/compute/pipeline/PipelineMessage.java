@@ -20,10 +20,6 @@ import com.olacabs.fabric.model.event.EventSet;
 import lombok.Builder;
 import lombok.Getter;
 
-
-/**
- * Created by santanu.s on 11/09/15.
- */
 public class PipelineMessage {
     @Getter
     private final Type messageType;

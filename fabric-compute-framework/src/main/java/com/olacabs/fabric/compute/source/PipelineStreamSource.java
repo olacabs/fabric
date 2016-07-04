@@ -42,9 +42,6 @@ import java.util.concurrent.*;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
-/**
- * Created by santanu.s on 12/09/15.
- */
 @Metrics
 public class PipelineStreamSource implements MessageSource {
     private static final Logger logger = LoggerFactory.getLogger(PipelineStreamSource.class);

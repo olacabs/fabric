@@ -35,9 +35,6 @@ import java.util.Map;
 
 import static kafka.common.ErrorMapping.OffsetMetadataTooLargeCode;
 
-/**
- * Created by santanu.s on 08/10/15.
- */
 public class KafkaBasedOffsetSource implements OffsetSource {
     private static final Logger logger = LoggerFactory.getLogger(KafkaBasedOffsetSource.class);
 

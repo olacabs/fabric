@@ -18,9 +18,6 @@ package com.olacabs.fabric.compute.comms;
 
 import java.util.Properties;
 
-/**
- * Created by santanu.s on 10/09/15.
- */
 public class ChannelFactory {
     public static <EventType> CommsChannel<EventType> create(final Properties properties,
                                                              final String name,

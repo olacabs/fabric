@@ -20,9 +20,6 @@ import com.olacabs.fabric.compute.EventCollector;
 import com.olacabs.fabric.compute.ProcessingContext;
 import com.olacabs.fabric.model.event.EventSet;
 
-/**
- * Created by santanu.s on 09/09/15.
- */
 public abstract class ScheduledProcessor extends ProcessorBase {
 
     public ScheduledProcessor() {

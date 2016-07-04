@@ -21,9 +21,6 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
 
-/**
- * Created by santanu.s on 02/10/15.
- */
 public enum ComponentSourceType {
     artifactory(ComponentSourceType.ARTIFACTORY),
     jar(ComponentSourceType.JAR);

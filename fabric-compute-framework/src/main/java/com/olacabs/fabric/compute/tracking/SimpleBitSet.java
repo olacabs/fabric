@@ -18,9 +18,6 @@ package com.olacabs.fabric.compute.tracking;
 
 import java.util.Arrays;
 
-/**
- * Created by santanu.s on 11/09/15.
- */
 public class SimpleBitSet {
     private static final int NUM_BITS_IN_WORD = Long.BYTES * 8;
     private final int nBits;

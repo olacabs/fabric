@@ -24,9 +24,6 @@ import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * Created by santanu.s on 05/11/15.
- */
 public class ComponentPropertyReaderTest {
 
     @Test
@@ -64,30 +61,19 @@ public class ComponentPropertyReaderTest {
     @Test
     public void testReadIntegerFromGlobal() {
         Properties properties = new Properties();
-        properties.setProperty("source.source_1.zookeeper", "10000");
         Properties globalProperties = new Properties();
-        globalProperties.setProperty("source.source_1.brokers", "10.200.2.196:9092");
-        globalProperties.setProperty("processor.processor_1.schemaServiceNamespace", "olacabs");
-        globalProperties.setProperty("processor.processor_1.ingestionBrokerList", "10.200.2.196:9092");
-        globalProperties.setProperty("processor.processor_1.sidelineStoreServiceName", "sidelinestoreserver");
-        globalProperties.setProperty("source.source_1.topic-name", "fabric.tenant2");
-        globalProperties.setProperty("processor.processor_1.sidelineStoreEnvironment", "stage");
-        globalProperties.setProperty("processor.processor_1.ingestionPoolSize", "5");
-        globalProperties.setProperty("processor.processor_1.sidelineStoreQueueSize", "10");
-        globalProperties.setProperty("processor.processor_1.schemaServiceEnvironment", "stage");
-        globalProperties.setProperty("processor.processor_1.sidelineZookeeper", "zk1.stg-analytics-storm.stg.olacabs.net:2181");
-        globalProperties.setProperty("source.source_1.zookeeper", "zk1.stg-analytics-storm.stg.olacabs.net");
-        globalProperties.setProperty("processor.processor_1.schemaServiceServiceName", "schemaservice");
-        globalProperties.setProperty("processor.processor_1.sidelineStoreNamespace", "olacabs");
-        globalProperties.setProperty("processor.processor_1.schemaServiceZookeeper", "zk1.stg-analytics-storm.stg.olacabs.net:2181");
+        globalProperties.setProperty("source.source_1.brokers", "localhost:9092");
+        globalProperties.setProperty("source.source_1.topic-name", "x");
+        globalProperties.setProperty("processor.processor_1.queueSize", "100");
+        globalProperties.setProperty("source.source_1.zookeeper", "localhost:2181");
         final int connStr = ComponentPropertyReader.readInteger(properties, globalProperties,
-            "ingestionPoolSize", "processor_1", ComponentMetadata.builder()
+            "queueSize", "processor_1", ComponentMetadata.builder()
                 .namespace("global")
                 .name("source")
                 .id("1234")
                 .type(ComponentType.PROCESSOR)
                 .build());
-        assertEquals(5, connStr);
+        assertEquals(100, connStr);
     }
 
     @Test

@@ -20,8 +20,6 @@ import com.codahale.metrics.ConsoleReporter;
 import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.SharedMetricRegistries;
-import com.codahale.metrics.graphite.GraphiteReporter;
-import com.codahale.metrics.graphite.GraphiteUDP;
 import com.codahale.metrics.jvm.FileDescriptorRatioGauge;
 import com.codahale.metrics.jvm.GarbageCollectorMetricSet;
 import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
@@ -53,9 +51,6 @@ import java.net.Inet4Address;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by santanu.s on 14/09/15.
- */
 public class Executor {
     private static final Logger logger = LoggerFactory.getLogger(Executor.class);
 
@@ -106,7 +101,6 @@ public class Executor {
     public void run(String[] args) throws Exception {
         Options options = new Options();
         options.addOption("m", "opentsdb-endpoint", true, "OpenTSDB endpoint host:port");
-        options.addOption("g", "graphite-endpoint", true, "Graphite endpoint host:port");
         options.addOption("d", "disable-metrics", true, "Disable metric completely");
         options.addOption("h", "help", false, "Print help");
         options.addOption(Option.builder("s")
@@ -122,9 +116,7 @@ public class Executor {
             .build());
 
         String opentsdbHost = null;
-        String graphiteHost = null;
         int opentsdbPort = 4242;
-        int graphitePort = 8080;
 
 
         CommandLineParser commandLineParser = new DefaultParser();
@@ -158,25 +150,9 @@ public class Executor {
             }
         }
 
-        if (commandLine.hasOption("g")) {
-            if (!commandLine.getOptionValue("g").equalsIgnoreCase("NIL")) {
-                String tokens[] = commandLine.getOptionValue("g").split(":");
-                if (tokens.length > 2) {
-                    throw new Exception("Cannot parse graphite connection string");
-                } else {
-                    graphiteHost = tokens[0].trim();
-                    if (tokens.length == 2) {
-                        graphitePort = Integer.valueOf(tokens[1]);
-                    }
-                }
-                logger.info("Setting graphite endpoint to {}:{}", graphiteHost, graphitePort);
-            }
-        }
-
-        if (Strings.isNullOrEmpty(opentsdbHost) && Strings.isNullOrEmpty(graphiteHost)) {
+        if (Strings.isNullOrEmpty(opentsdbHost)) {
             logger.warn("No metrics data available");
         }
-
 
         MetadataSource metadataSource = metadataSource(commandLine);
 
@@ -215,18 +191,7 @@ public class Executor {
             registry.register("memory", new MemoryUsageGaugeSet());
             registry.register("threads", new ThreadStatesGaugeSet());
             registry.register("fd", new FileDescriptorRatioGauge());
-            if (!Strings.isNullOrEmpty(graphiteHost)) {
-                long interval = (null != System.getenv("GRAPHITE_REPORTER_INTERVAL")) ? Long.valueOf(System.getenv("GRAPHITE_REPORTER_INTERVAL")) : 60L;
-                String specUrl = specPath(commandLine);
-                String[] tokens = specUrl.split("/");
-                String tenant = tokens[tokens.length - 2];
-                GraphiteReporter.forRegistry(registry)
-                    .prefixedWith(MetricsPrefixGenerator.getMetricsPrefix())
-                    .convertRatesTo(TimeUnit.SECONDS)
-                    .filter(MetricFilter.ALL)
-                    .build(new GraphiteUDP(graphiteHost, graphitePort))
-                    .start(interval, TimeUnit.SECONDS);
-            } else if (!Strings.isNullOrEmpty(opentsdbHost)) {
+            if (!Strings.isNullOrEmpty(opentsdbHost)) {
                 long interval = (null != System.getenv("OPENTSDB_REPORTER_INTERVAL")) ? Long.valueOf(System.getenv("OPENTSDB_REPORTER_INTERVAL")) : 60L;
                 OpenTsdbReporter.forRegistry(registry)
                     .prefixedWith(spec.getName())

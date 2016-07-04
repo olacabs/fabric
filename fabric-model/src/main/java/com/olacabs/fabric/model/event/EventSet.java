@@ -25,9 +25,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by santanu.s on 09/09/15.
- */
 public class EventSet {
     @Getter
     private final int sourceId;

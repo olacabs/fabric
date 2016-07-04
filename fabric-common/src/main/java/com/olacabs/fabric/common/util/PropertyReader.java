@@ -20,9 +20,6 @@ import com.google.common.base.Strings;
 
 import java.util.Properties;
 
-/**
- * Created by santanu.s on 09/09/15.
- */
 public class PropertyReader {
     public static Boolean readBoolean(Properties properties, Properties globalProperties, final String propertyName) {
         return readBoolean(properties, globalProperties, propertyName, null);

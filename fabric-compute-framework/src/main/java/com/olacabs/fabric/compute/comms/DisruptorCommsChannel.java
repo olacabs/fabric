@@ -29,9 +29,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by guruprasad.sridharan on 26/06/16.
- */
 @Slf4j
 @Setter
 @Getter

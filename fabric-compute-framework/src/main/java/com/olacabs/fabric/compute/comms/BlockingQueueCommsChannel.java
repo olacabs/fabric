@@ -23,9 +23,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 
-/**
- * Created by santanu.s on 10/09/15.
- */
 @Slf4j
 public class BlockingQueueCommsChannel<EventType> implements CommsChannel<EventType> {
     private final String name;

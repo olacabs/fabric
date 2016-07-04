@@ -27,9 +27,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 
-/**
- * Created by santanu.s on 02/10/15.
- */
 public class ComponentUrlResolver implements ComponentSourceVisitor {
 
     private static Logger logger = LoggerFactory.getLogger(ComponentUrlResolver.class);

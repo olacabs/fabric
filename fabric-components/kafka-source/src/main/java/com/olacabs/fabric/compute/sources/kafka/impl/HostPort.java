@@ -21,9 +21,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Created by santanu.s on 06/10/15.
- */
 @Data
 @Builder
 @AllArgsConstructor

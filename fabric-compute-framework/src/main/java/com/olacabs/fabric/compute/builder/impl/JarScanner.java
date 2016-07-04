@@ -39,9 +39,6 @@ import java.net.URLClassLoader;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * Created by santanu.s on 24/09/15.
- */
 public class JarScanner {
     private static final Logger logger = LoggerFactory.getLogger(DownloadingLoader.class);
 

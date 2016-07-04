@@ -21,9 +21,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * Created by santanu.s on 10/09/15.
- */
 @EqualsAndHashCode(callSuper = false)
 @Data
 @AllArgsConstructor

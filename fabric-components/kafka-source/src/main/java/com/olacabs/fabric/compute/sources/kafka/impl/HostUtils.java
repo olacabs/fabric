@@ -22,9 +22,6 @@ import org.slf4j.LoggerFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-/**
- * Created by santanu.s on 07/10/15.
- */
 public class HostUtils {
     private static final Logger logger = LoggerFactory.getLogger(HostUtils.class);
 

@@ -27,9 +27,6 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Properties;
 
-/**
- * Created by santanu.s on 12/09/15.
- */
 public class ComputationPipeline {
     private static final Logger logger = LoggerFactory.getLogger(ComputationPipeline.class);
     private static final long DEFAULT_WAIT_TIME_IN_SECONDS = 30;

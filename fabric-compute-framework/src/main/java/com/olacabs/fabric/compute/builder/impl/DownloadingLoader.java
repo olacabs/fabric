@@ -27,9 +27,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by santanu.s on 19/09/15.
- */
 public class DownloadingLoader implements Loader {
     private static final Comparator<ComponentMetadata> METADATA_COMPARATOR
         = (lhs, rhs) -> String.format("%s:%s:%s", lhs.getNamespace(), lhs.getName(), lhs.getVersion())

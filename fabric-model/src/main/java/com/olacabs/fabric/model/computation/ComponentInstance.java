@@ -24,9 +24,6 @@ import lombok.NoArgsConstructor;
 
 import java.util.Properties;
 
-/**
- * Created by santanu.s on 05/10/15.
- */
 @Data
 @Builder
 @AllArgsConstructor

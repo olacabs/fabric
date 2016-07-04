@@ -28,10 +28,6 @@ import com.olacabs.fabric.model.event.EventSet;
 
 import java.util.Properties;
 
-/**
- * Created by santanu.s on 09/09/15.
- */
-
 public class PrinterStreamingProcessor extends StreamingProcessor {
     private ObjectMapper objectMapper;
 

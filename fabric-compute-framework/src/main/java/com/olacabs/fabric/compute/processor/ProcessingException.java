@@ -16,9 +16,6 @@
 
 package com.olacabs.fabric.compute.processor;
 
-/**
- * Created by santanu.s on 08/09/15.
- */
 public class ProcessingException extends Exception {
     public ProcessingException() {
     }

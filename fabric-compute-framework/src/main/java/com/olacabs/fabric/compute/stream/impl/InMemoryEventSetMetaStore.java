@@ -22,9 +22,6 @@ import com.olacabs.fabric.model.event.EventSetMeta;
 import java.util.Collection;
 import java.util.Collections;
 
-/**
- * Created by santanu.s on 10/09/15.
- */
 public class InMemoryEventSetMetaStore implements EventSetMetaStore {
 
     //private Map<Long, EventSetMeta> eventSetMetaMap = Maps.newHashMap();

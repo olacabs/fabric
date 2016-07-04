@@ -34,9 +34,6 @@ import java.io.File;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by guruprasad.sridharan on 17/02/16.
- */
 @Slf4j
 public class PipelineTestBench {
 

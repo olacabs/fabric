@@ -22,9 +22,6 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-/**
- * Created by santanu.s on 08/09/15.
- */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @JsonIgnoreProperties(ignoreUnknown = true)

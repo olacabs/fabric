@@ -21,9 +21,6 @@ import com.olacabs.fabric.model.common.ComponentMetadata;
 
 import java.util.Properties;
 
-/**
- * Created by santanu.s on 03/11/15.
- */
 public class ComponentPropertyReader {
 
     public static String readString(Properties properties, Properties global,

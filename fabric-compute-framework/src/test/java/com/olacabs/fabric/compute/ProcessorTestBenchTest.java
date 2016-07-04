@@ -32,9 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-/**
- * Created by santanu.s on 23/09/15.
- */
 @Slf4j
 public class ProcessorTestBenchTest {
     @Test
