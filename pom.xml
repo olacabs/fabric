@@ -70,6 +70,105 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.rat</groupId>
+                <artifactId>apache-rat-plugin</artifactId>
+                <configuration>
+                    <useDefaultExcludes>true</useDefaultExcludes>
+                    <useMavenDefaultExcludes>true</useMavenDefaultExcludes>
+                    <useIdeaDefaultExcludes>true</useIdeaDefaultExcludes>
+                    <useEclipseDefaultExcludes>true</useEclipseDefaultExcludes>
+                    <excludeSubProjects>true</excludeSubProjects>
+                    <excludes>
+                        <exclude>*.txt</exclude>
+                        <exclude>**/*.txt</exclude>
+                        <exclude>**/*.svg</exclude>
+                        <exclude>*.md</exclude>
+                        <exclude>**/*.md</exclude>
+                        <exclude>.git/**</exclude>
+                        <exclude>**/.idea/**</exclude>
+                        <exclude>**/*.twiki</exclude>
+                        <exclude>**/*.iml</exclude>
+                        <exclude>**/target/**</exclude>
+                        <exclude>**/activemq-data/**</exclude>
+                        <exclude>**/build/**</exclude>
+                        <exclude>**/*.patch</exclude>
+                        <exclude>derby.log</exclude>
+                        <exclude>**/logs/**</exclude>
+                        <exclude>**/.classpath</exclude>
+                        <exclude>**/.project</exclude>
+                        <exclude>**/.settings/**</exclude>
+                        <exclude>**/test-output/**</exclude>
+                        <exclude>**/data.txt</exclude>
+                        <exclude>**/maven-eclipse.xml</exclude>
+                        <exclude>**/.externalToolBuilders/**</exclude>
+                        <exclude>html5-ui/**</exclude>
+                        <exclude>**/metastore_db/**</exclude>
+                        <exclude>**/db1.log</exclude>
+                        <exclude>**/db1.properties</exclude>
+                        <exclude>**/db1.script</exclude>
+                        <exclude>**/credential_provider.jceks</exclude>
+                        <exclude>**/*.json</exclude>
+                        <exclude>dependency-reduced-pom.xml</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>rat-check</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <phase>verify</phase>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>checkstyle-check</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <phase>verify</phase>
+                        <configuration>
+                            <consoleOutput>true</consoleOutput>
+                            <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                            <configLocation>src/build/checkstyle.xml</configLocation>
+                            <headerLocation>src/build/checkstyle-java-header.txt</headerLocation>
+                            <suppressionsLocation>src/build/checkstyle-suppressions.xml</suppressionsLocation>
+                            <failOnViolation>true</failOnViolation>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
+                <configuration>
+                    <debug>false</debug>
+                    <xmlOutput>true</xmlOutput>
+                    <excludeFilterFile>src/build/findbugs-exclude.xml</excludeFilterFile>
+                    <failOnError>true</failOnError>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>findbugs-check</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <phase>verify</phase>
+                    </execution>
+                </executions>
+            </plugin-->
+            <!-- Source code metrics: mvn javancss:report or mvn site -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>javancss-maven-plugin</artifactId>
+            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
@@ -80,6 +179,32 @@
                     <configuration>
                         <skip>false</skip>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.rat</groupId>
+                    <artifactId>apache-rat-plugin</artifactId>
+                    <version>0.7</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>2.17</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>3.4</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>findbugs-maven-plugin</artifactId>
+                    <version>3.0.3</version>
+                </plugin>
+                <!-- Source code metrics: mvn javancss:report or mvn site -->
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>javancss-maven-plugin</artifactId>
+                    <version>2.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>
