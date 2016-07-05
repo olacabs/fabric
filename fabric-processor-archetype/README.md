@@ -1,1 +1,0 @@
-fabric-processor-archetype
