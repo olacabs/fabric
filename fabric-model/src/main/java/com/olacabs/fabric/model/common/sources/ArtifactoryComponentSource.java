@@ -23,10 +23,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Created by santanu.s on 02/10/15.
- */
-
 public class ArtifactoryComponentSource extends ComponentSource {
     @Getter
     @Setter

@@ -22,9 +22,6 @@ import com.olacabs.fabric.model.common.ComponentSourceVisitor;
 import lombok.Builder;
 import lombok.Data;
 
-/**
- * Created by santanu.s on 02/10/15.
- */
 @Data
 public class JarComponentSource extends ComponentSource {
     private String url;
