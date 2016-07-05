@@ -18,7 +18,11 @@ package com.olacabs.fabric.model.computation;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.common.collect.Maps;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.Singular;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -28,13 +32,16 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+/**
+ * TODO Add more.
+ */
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ComputationSpec {
-    Properties properties = new Properties();
+    private Properties properties = new Properties();
     private String id;
     @NotNull
     @NotEmpty

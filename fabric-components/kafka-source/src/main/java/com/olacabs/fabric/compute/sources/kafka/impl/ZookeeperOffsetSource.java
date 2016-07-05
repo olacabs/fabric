@@ -30,10 +30,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Zookeeper based offset manager
+ * Zookeeper based offset manager.
  */
 public class ZookeeperOffsetSource implements OffsetSource {
-    private static final Logger logger = LoggerFactory.getLogger(ZookeeperOffsetSource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZookeeperOffsetSource.class);
 
     private final String topologyName;
     private final String topicName;
@@ -43,7 +43,8 @@ public class ZookeeperOffsetSource implements OffsetSource {
     private final Set<String> ensuredPaths = Sets.newConcurrentHashSet();
 
     @Builder
-    public ZookeeperOffsetSource(String topologyName, String topicName, CuratorFramework curatorFramework, ObjectMapper objectMapper) {
+    public ZookeeperOffsetSource(String topologyName, String topicName, CuratorFramework curatorFramework,
+            ObjectMapper objectMapper) {
         this.topologyName = topologyName;
         this.topicName = topicName;
         this.curatorFramework = curatorFramework;
@@ -54,9 +55,9 @@ public class ZookeeperOffsetSource implements OffsetSource {
                 curatorFramework.create().creatingParentContainersIfNeeded().forPath(path);
             }
         } catch (KeeperException.NodeExistsException e) {
-            logger.info("{} already exists.", path);
+            LOGGER.info("{} already exists.", path);
         } catch (Exception e) {
-            logger.warn("Error creating path on ZK: {}", path, e);
+            LOGGER.warn("Error creating path on ZK: {}", path, e);
         }
     }
 
@@ -70,7 +71,7 @@ public class ZookeeperOffsetSource implements OffsetSource {
 
     @Override
     public void saveOffset(String topic, int partition, long offset) throws Exception {
-        //TODO::BATCH THIS
+        //TODO BATCH THIS
         final String path = partitionPath(topologyName, topicName, partition);
         if (!ensuredPaths.contains(path)) {
             if (null == curatorFramework.checkExists().forPath(path)) {
@@ -78,7 +79,8 @@ public class ZookeeperOffsetSource implements OffsetSource {
             }
         }
         ensuredPaths.add(path);
-        curatorFramework.setData().forPath(path, objectMapper.writeValueAsBytes(Collections.singletonMap("offset", offset)));
+        curatorFramework.setData()
+                .forPath(path, objectMapper.writeValueAsBytes(Collections.singletonMap("offset", offset)));
     }
 
     @Override

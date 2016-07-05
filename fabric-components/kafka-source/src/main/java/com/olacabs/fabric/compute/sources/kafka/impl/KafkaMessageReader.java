@@ -41,8 +41,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * TODO Add more.
+ */
 public class KafkaMessageReader implements Runnable {
-    private static final Logger logger = LoggerFactory.getLogger(KafkaMessageReader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaMessageReader.class);
     private static final int DEFAULT_TIME_TO_WAIT = 30000;
     private static final int DEFAULT_MIN_BYTES_TO_WAIT = 1;
 
@@ -63,7 +66,9 @@ public class KafkaMessageReader implements Runnable {
     private String startOffsetPickStrategy;
 
     @Builder
-    public KafkaMessageReader(String topic, int partition, KafkaConsumerBuilder consumerBuilder, OffsetSource offsetSource, BlockingQueue<RawEventBundle> events, int bufferSize, TransactionManager transactionManager, String startOffsetPickStrategy) {
+    public KafkaMessageReader(String topic, int partition, KafkaConsumerBuilder consumerBuilder,
+            OffsetSource offsetSource, BlockingQueue<RawEventBundle> events, int bufferSize,
+            TransactionManager transactionManager, String startOffsetPickStrategy) {
         this.topic = topic;
         this.partition = partition;
         this.consumerBuilder = consumerBuilder;
@@ -78,7 +83,7 @@ public class KafkaMessageReader implements Runnable {
         transactionManager.initialize();
     }
 
-    public RawEventBundle readEvents(long startOffset, int bufferSize) throws Exception {
+    public RawEventBundle readEvents(long startOffset, int bufferSizeArg) throws Exception {
         ImmutableList.Builder<Event> eventsBuilder = ImmutableList.builder();
         Map<String, Object> meta = Maps.newHashMap();
         long minOffset = -1;
@@ -88,60 +93,61 @@ public class KafkaMessageReader implements Runnable {
         long transactionId = 0L;
         do {
             if (stopRequested.get()) {
-                logger.info("[{}:{}] Exiting as stop was requested...", topic, partition);
+                LOGGER.info("[{}:{}] Exiting as stop was requested...", topic, partition);
                 throw new Exception("Stop called as we lost leadership");
             }
             try {
                 if (null == consumer) {
                     consumer = consumerBuilder.consumersForTopicPartition(topic, partition);
-                    logger.info("Created consumers for [{}:{}]", topic, partition);
+                    LOGGER.info("Created consumers for [{}:{}]", topic, partition);
                 }
                 existingMeta = transactionManager.getExisting();
-                int bufferSizeInUse = bufferSize;
+                int bufferSizeInUse = bufferSizeArg;
                 if (null != existingMeta) {
-                    logger.info("[{}:{}] Found existing transaction: {}", topic, partition, existingMeta.getTransactionId());
+                    LOGGER.info("[{}:{}] Found existing transaction: {}", topic, partition,
+                            existingMeta.getTransactionId());
                     startOffset = Long.parseLong(existingMeta.getMeta().get("startOffset").toString());
                     bufferSizeInUse = Integer.parseInt(existingMeta.getMeta().get("size").toString());
-                    bufferSizeInUse = (0 == bufferSizeInUse) ? bufferSize : bufferSizeInUse;
+                    bufferSizeInUse = (0 == bufferSizeInUse) ? bufferSizeArg : bufferSizeInUse;
                 }
                 if (-1 == startOffset) {
-                    logger.warn("[{}:{}] No offset found from store. Will read current offsets from kafka. " +
-                            "Unprocessed messages before that will be lost. This is normal for first time.",
-                        topic, partition, startOffset);
+                    LOGGER.warn("[{}:{}] No offset found from store. Will read current offsets from kafka. "
+                                    + "Unprocessed messages before that will be lost. This is normal for first time"
+                            + ".",
+                            topic, partition, startOffset);
                     if (startOffsetPickStrategy.equalsIgnoreCase(StartOffsetPickStrategy.EARLIEST.toString())) {
-                        logger.debug("Picking earliest available offset for partition from Kafka");
-                        startOffset = KafkaMetadataClient.startOffset(consumer,
-                            topic, partition, StartOffsetPickStrategy.EARLIEST.toString());
+                        LOGGER.debug("Picking earliest available offset for partition from Kafka");
+                        startOffset = KafkaMetadataClient
+                                .startOffset(consumer, topic, partition, StartOffsetPickStrategy.EARLIEST.toString());
                     } else {
-                        logger.debug("Picking latest available offset for partition from Kafka");
-                        startOffset = KafkaMetadataClient.startOffset(consumer,
-                            topic, partition, StartOffsetPickStrategy.LATEST.toString());
+                        LOGGER.debug("Picking latest available offset for partition from Kafka");
+                        startOffset = KafkaMetadataClient
+                                .startOffset(consumer, topic, partition, StartOffsetPickStrategy.LATEST.toString());
                     }
-                    logger.info("[{}:{}] Start offset set from kafka meta to: {}", topic, partition, startOffset);
+                    LOGGER.info("[{}:{}] Start offset set from kafka meta to: {}", topic, partition, startOffset);
                 } else {
-                    logger.info("[{}:{}] Start offset set to: {}", topic, partition, startOffset);
+                    LOGGER.info("[{}:{}] Start offset set to: {}", topic, partition, startOffset);
                 }
-                FetchRequest fetchRequest = new FetchRequestBuilder()
-                    .clientId(HostUtils.hostname())
-                    .addFetch(topic, partition, startOffset, bufferSizeInUse)
-                    .maxWait(DEFAULT_TIME_TO_WAIT)
-                    .minBytes(DEFAULT_MIN_BYTES_TO_WAIT)
-                    .build();
+                FetchRequest fetchRequest = new FetchRequestBuilder().clientId(HostUtils.hostname())
+                        .addFetch(topic, partition, startOffset, bufferSizeInUse).maxWait(DEFAULT_TIME_TO_WAIT)
+                        .minBytes(DEFAULT_MIN_BYTES_TO_WAIT).build();
                 FetchResponse fetchResponse = consumer.fetch(fetchRequest);
 
                 if (fetchResponse.hasError()) {
                     short errorCode = fetchResponse.errorCode(topic, partition);
                     if (1 == errorCode) {
-                        logger.warn("[{}:{}] Has lagged too much. Offsets will be reset to earliest available message.",
-                            topic, partition);
+                        LOGGER.warn("[{}:{}] Has lagged too much. Offsets will be reset to earliest available message.",
+                                topic, partition);
                         startOffset = -1;
                         if (null != existingMeta) {
-                            logger.warn("[{}:{}] Transaction {} is too old and cannot be processed. Will be acked without processing.", topic, partition, existingMeta.getTransactionId());
+                            LOGGER.warn(
+                                    "[{}:{}] Transaction {} is too old and cannot be processed. Will be acked without"
+                                            + " processing.", topic, partition, existingMeta.getTransactionId());
                             transactionManager.ack(existingMeta.getTransactionId());
                         }
                         continue;
                     }
-                    logger.error("[{}:{}] Received error-code from kafka: ", topic, partition, errorCode);
+                    LOGGER.error("[{}:{}] Received error-code from kafka: ", topic, partition, errorCode);
                     throw new Exception("Received error-code from kafka: " + errorCode);
                 }
                 for (MessageAndOffset messageAndOffset : fetchResponse.messageSet(topic, partition)) {
@@ -150,10 +156,7 @@ public class KafkaMessageReader implements Runnable {
                     ByteBuffer payload = messageAndOffset.message().payload();
                     byte[] bytes = new byte[payload.limit()];
                     payload.get(bytes);
-                    eventsBuilder.add(Event.builder()
-                        .id(messageAndOffset.offset())
-                        .data(bytes)
-                        .build());
+                    eventsBuilder.add(Event.builder().id(messageAndOffset.offset()).data(bytes).build());
                     hasMessages = true;
                 }
                 if (hasMessages) {
@@ -164,62 +167,59 @@ public class KafkaMessageReader implements Runnable {
                         meta.put("endOffset", nextMessageOffset);
                         meta.put("size", fetchResponse.messageSet(topic, partition).sizeInBytes());
                         transactionId = transactionManager.getNewTransactionId();
-                        logger.info("[{}:{} Transaction ID: {}", topic, partition, transactionId);
-                        transactionManager.save(
-                            EventSetMeta.builder()
-                                .transactionId(transactionId)
-                                .meta(meta)
-                                .build());
+                        LOGGER.info("[{}:{} Transaction ID: {}", topic, partition, transactionId);
+                        transactionManager.save(EventSetMeta.builder().transactionId(transactionId).meta(meta).build());
                     } else {
                         transactionId = existingMeta.getTransactionId();
                         meta.putAll(existingMeta.getMeta());
                     }
                     break;
                 } else {
-                    logger.info("[{}:{}]No messages detected.", topic, partition);
+                    LOGGER.info("[{}:{}]No messages detected.", topic, partition);
                 }
-            } /*catch (SocketTimeoutException e) {
-                logger.error("[{}:{}] Socket timed out without data", topic, partition);
+            } catch (Throwable t) {
+                 /*catch (SocketTimeoutException e) {
+                LOGGER.error("[{}:{}] Socket timed out without data", topic, partition);
             } *//*catch (BrokerQueryException| ClosedChannelException |InterruptedException e) {
-                logger.error("[{}:{}] Interrupted. Not a leader anymore.", topic, partition);
+                LOGGER.error("[{}:{}] Interrupted. Not a leader anymore.", topic, partition);
                 if(null != consumer) {
                     consumer.close();
                 }
                 consumer = null;
                 throw e;
                 //throw new Exception(String.format("Not a leader anymore: [%s:%d]", topic, partition));
-            } */ catch (Throwable t) {
-                if (t instanceof OffsetOutOfRangeException || t instanceof org.apache.kafka.common.errors.OffsetOutOfRangeException) {
+            } */
+                if (t instanceof OffsetOutOfRangeException
+                        || t instanceof org.apache.kafka.common.errors.OffsetOutOfRangeException) {
                     startOffset = -1;
                     if (null != existingMeta) {
-                        logger.warn("[{}:{}] Transaction {} is too old and cannot be processed. Will be acked without processing.", topic, partition, existingMeta.getTransactionId());
+                        LOGGER.warn("[{}:{}] Transaction {} is too old and cannot be processed. Will be acked without "
+                                + "processing.", topic, partition, existingMeta.getTransactionId());
                         transactionManager.ack(existingMeta.getTransactionId());
                     }
-                    logger.warn("[{}:{}] Has lagged too much. Offsets will be rest to earliest available message.", topic, partition);
+                    LOGGER.warn("[{}:{}] Has lagged too much. Offsets will be rest to earliest available message.",
+                            topic, partition);
                 }
-                logger.error("[{}:{}] Error occurred while reading message. Consumer will be recreated.", topic, partition, t);
+                LOGGER.error("[{}:{}] Error occurred while reading message. Consumer will be recreated.", topic,
+                        partition, t);
                 if (null != consumer) {
                     consumer.close();
                 }
                 consumer = null;
             }
             if (stopRequested.get()) {
-                logger.info("[{}:{}] Fetched but exiting as stop was requested...", topic, partition);
+                LOGGER.info("[{}:{}] Fetched but exiting as stop was requested...", topic, partition);
                 throw new Exception("Fetched, but exiting as we lost leadership");
             }
         } while (!hasMessages);
-        logger.info("[{}:{}] Read data from {} to {}", topic, partition, startOffset, nextMessageOffset - 1);
-        return RawEventBundle.builder()
-            .events(eventsBuilder.build())
-            .meta(ImmutableMap.copyOf(meta))
-            .transactionId(transactionId)
-            .partitionId(partition)
-            .build();
+        LOGGER.info("[{}:{}] Read data from {} to {}", topic, partition, startOffset, nextMessageOffset - 1);
+        return RawEventBundle.builder().events(eventsBuilder.build()).meta(ImmutableMap.copyOf(meta))
+                .transactionId(transactionId).partitionId(partition).build();
     }
 
 /*    public RawEventBundle replayEvents(Map<String, Object> meta) throws Exception {
         if(null == meta || meta.isEmpty()) {
-            logger.warn("[{}:{}] replayEvents called with empty map. Reverting to getNewEvents", topic, partition);
+            LOGGER.warn("[{}:{}] replayEvents called with empty map. Reverting to getNewEvents", topic, partition);
             return getNewEvents();
         }
         long startOffset = -1;
@@ -227,16 +227,18 @@ public class KafkaMessageReader implements Runnable {
             startOffset = (long)meta.get("startOffset");
         }
         else {
-            logger.warn("[{}:{}] replayEvents called without startOffset. Start offset will be set to 0.", topic, partition);
-            //TODO:: SET TO 0 OR READ LAST OFFSET IN STORE
+            LOGGER.warn("[{}:{}] replayEvents called without startOffset. Start offset will be set to 0.", topic,
+            partition);
+            //TODO SET TO 0 OR READ LAST OFFSET IN STORE
         }
         long endOffset = 0;
         if(meta.containsKey("endOffset")) {
             endOffset = (long)meta.get("endOffset");
         }
         else {
-            logger.warn("[{}:{}] replayEvents called without endOffset. End offset will be set to -1.", topic, partition);
-            //TODO:: SET TO 0 OR READ LAST OFFSET IN STORE
+            LOGGER.warn("[{}:{}] replayEvents called without endOffset. End offset will be set to -1.", topic,
+            partition);
+            //TODO SET TO 0 OR READ LAST OFFSET IN STORE
         }
 
         return readEvents(startOffset, bufferSize, endOffset);
@@ -256,7 +258,7 @@ public class KafkaMessageReader implements Runnable {
             }
             offsetSource.saveOffset(topic, partition, endOffset);
             transactionManager.ack(eventBundle.getTransactionId());
-            logger.info("[{}:{}]Messages acked till: {}", topic, partition, endOffset - 1);
+            LOGGER.info("[{}:{}]Messages acked till: {}", topic, partition, endOffset - 1);
             lastMessageAcked.set(true);
             condition.signal();
         } finally {
@@ -272,16 +274,16 @@ public class KafkaMessageReader implements Runnable {
         } finally {
             lock.unlock();
         }
-        logger.info("[{}:{}] Stopped reader", topic, partition);
+        LOGGER.info("[{}:{}] Stopped reader", topic, partition);
     }
 
     public void run() {
-        logger.info("[{}:{}] Became leader.", topic, partition);
-        logger.info("[{}:{}] Reading pending transactions", topic, partition);
+        LOGGER.info("[{}:{}] Became leader.", topic, partition);
+        LOGGER.info("[{}:{}] Reading pending transactions", topic, partition);
         try {
             this.transactionManager.readPendingTransactions();
         } catch (Exception e) {
-            logger.error("Error reading pending transactions...", topic, partition, e);
+            LOGGER.error("Error reading pending transactions...", topic, partition, e);
         }
         stopRequested.set(false);
         lastMessageAcked.set(true);
@@ -293,7 +295,7 @@ public class KafkaMessageReader implements Runnable {
                     condition.await();
                 }
                 if (stopRequested.get()) {
-                    logger.info("Stopping consumer");
+                    LOGGER.info("Stopping consumer");
                     if (null != consumer) {
                         consumer.close();
                     }
@@ -304,9 +306,9 @@ public class KafkaMessageReader implements Runnable {
                     messageReadingEnabled = true;
                 }
             } catch (InterruptedException e) {
-                logger.error("[{}:{}] Relinquishing leadership.", topic, partition);
+                LOGGER.error("[{}:{}] Relinquishing leadership.", topic, partition);
             } catch (Throwable t) {
-                logger.error("Blocking throwable: ", t);
+                LOGGER.error("Blocking throwable: ", t);
             } finally {
                 lock.unlock();
             }
@@ -316,10 +318,10 @@ public class KafkaMessageReader implements Runnable {
                     events.put(eventBundle);
                 }
             } catch (BrokerQueryException | ClosedChannelException | InterruptedException e) {
-                logger.error("[{}:{}] Relinquishing leadership.", topic, partition);
+                LOGGER.error("[{}:{}] Relinquishing leadership.", topic, partition);
                 //return;
             } catch (Throwable t) {
-                logger.error("Blocking throwable: ", t);
+                LOGGER.error("Blocking throwable: ", t);
             }
         }
     }

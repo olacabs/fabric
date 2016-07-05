@@ -23,11 +23,14 @@ import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
+/**
+ * TODO Add more.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class EventSetMeta {
-    Map<String, Object> meta;
+    private Map<String, Object> meta;
     private long transactionId;
 }

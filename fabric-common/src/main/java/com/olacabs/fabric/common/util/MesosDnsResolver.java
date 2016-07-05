@@ -24,6 +24,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
+/**
+ *TODO add more.
+ */
 @Slf4j
 public class MesosDnsResolver {
     private final DnsReporter dnsReporter;

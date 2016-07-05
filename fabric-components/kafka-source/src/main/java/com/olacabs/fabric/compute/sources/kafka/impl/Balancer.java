@@ -31,8 +31,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
+/**
+ * TODO Add more.
+ */
 public class Balancer {
-    private static final Logger logger = LoggerFactory.getLogger(Balancer.class);
+    private static final Logger LOGGER  = LoggerFactory.getLogger(Balancer.class);
 
     private final String topologyName;
     private final String brokers;
@@ -49,7 +52,8 @@ public class Balancer {
 
     @Builder
     public Balancer(String instanceId, String topologyName, String brokers, String topic,
-                    CuratorFramework curatorFramework, ObjectMapper objectMapper, int bufferSize, String startOffsetPickStrategy) {
+            CuratorFramework curatorFramework, ObjectMapper objectMapper, int bufferSize,
+            String startOffsetPickStrategy) {
         this.topologyName = topologyName;
         this.brokers = brokers;
         this.topic = topic;
@@ -64,7 +68,7 @@ public class Balancer {
         if (leaders.isEmpty()) {
             throw new Exception("Could not find any leaders for any of the partitions in topic: " + topic);
         }
-        logger.info("Number of leaders: {}", leaders.size());
+        LOGGER.info("Number of leaders: {}", leaders.size());
         events = new LinkedBlockingQueue<>(leaders.size());
         KafkaConsumerBuilder consumerBuilder = KafkaConsumerBuilder.builder()
             .brokers(brokers)
@@ -95,7 +99,7 @@ public class Balancer {
                             .partition(entry.getKey())
                             .build())
                     .build());
-            logger.info("Created reader object for {}", topic);
+            LOGGER.info("Created reader object for {}", topic);
         });
         readers.values().forEach(kafkaMessageReader -> {
             try {
@@ -104,7 +108,8 @@ public class Balancer {
                 throw new RuntimeException(e);
             }
         });
-        KafkaReaderLeaderElector leaderElector = new KafkaReaderLeaderElector(topologyName, topic, readers, curatorFramework, objectMapper);
+        KafkaReaderLeaderElector leaderElector =
+                new KafkaReaderLeaderElector(topologyName, topic, readers, curatorFramework, objectMapper);
         leaderElector.start();
     }
 
@@ -112,18 +117,18 @@ public class Balancer {
         try {
             readers.values().forEach(KafkaMessageReader::stop);
         } catch (Exception e) {
-            logger.error("Error stopping reader: ", e);
+            LOGGER.error("Error stopping reader: ", e);
         }
         try {
             leaderSelectors.forEach(LeaderSelector::close);
         } catch (Exception e) {
-            logger.error("Error closing selector: ", e);
+            LOGGER.error("Error closing selector: ", e);
         }
     }
 
     public void ack(RawEventBundle rawEventBundle) {
         try {
-            logger.info("To ack for: {}", rawEventBundle.getPartitionId());
+            LOGGER.info("To ack for: {}", rawEventBundle.getPartitionId());
             readers.get(rawEventBundle.getPartitionId()).ackMessage(rawEventBundle);
         } catch (Exception e) {
             e.printStackTrace();

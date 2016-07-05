@@ -16,6 +16,9 @@
 
 package com.olacabs.fabric.model.common;
 
+/**
+ * TODO Add more.
+ */
 public enum ComponentType {
     SOURCE,
     PROCESSOR

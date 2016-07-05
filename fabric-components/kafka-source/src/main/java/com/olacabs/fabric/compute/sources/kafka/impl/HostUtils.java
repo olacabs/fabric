@@ -22,8 +22,15 @@ import org.slf4j.LoggerFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-public class HostUtils {
-    private static final Logger logger = LoggerFactory.getLogger(HostUtils.class);
+/**
+ * TODO.
+ */
+public final class HostUtils {
+
+    private HostUtils() {
+
+    }
+    private static final Logger LOGGER = LoggerFactory.getLogger(HostUtils.class);
 
     private static String hostname;
 
@@ -31,7 +38,7 @@ public class HostUtils {
         try {
             hostname = InetAddress.getLocalHost().getHostAddress();
         } catch (UnknownHostException e) {
-            logger.error("Could not find host IP: ", e);
+            LOGGER.error("Could not find host IP: ", e);
             hostname = "localhost";
         }
     }
