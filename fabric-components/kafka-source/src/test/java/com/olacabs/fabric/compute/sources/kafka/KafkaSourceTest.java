@@ -26,6 +26,9 @@ import org.junit.Test;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ *
+ */
 public class KafkaSourceTest {
 
     @Ignore

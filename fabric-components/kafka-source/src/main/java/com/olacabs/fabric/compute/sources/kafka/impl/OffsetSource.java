@@ -16,6 +16,9 @@
 
 package com.olacabs.fabric.compute.sources.kafka.impl;
 
+/**
+ * TODO java doc.
+ */
 public interface OffsetSource {
     void saveOffset(final String topic, int partition, long offset) throws Exception;
 

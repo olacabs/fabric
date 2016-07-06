@@ -32,7 +32,8 @@ import javax.validation.constraints.NotNull;
 @JsonSubTypes({
     @JsonSubTypes.Type(value = JarComponentSource.class, name = ComponentSourceType.JAR),
     @JsonSubTypes.Type(value = ArtifactoryComponentSource.class, name = ComponentSourceType.ARTIFACTORY),
-})
+    })
+
 public abstract class ComponentSource {
     @JsonIgnore
     @Getter
@@ -43,5 +44,5 @@ public abstract class ComponentSource {
         this.type = type;
     }
 
-    abstract public void accept(ComponentSourceVisitor visitor);
+    public abstract void accept(ComponentSourceVisitor visitor);
 }

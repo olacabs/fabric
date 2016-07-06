@@ -20,12 +20,21 @@ import com.google.common.base.Strings;
 
 import java.util.Properties;
 
-public class PropertyReader {
+/**
+ *TODO add more.
+ */
+public final class PropertyReader {
+
+    private PropertyReader() {
+
+    }
+
     public static Boolean readBoolean(Properties properties, Properties globalProperties, final String propertyName) {
         return readBoolean(properties, globalProperties, propertyName, null);
     }
 
-    public static Boolean readBoolean(Properties properties, Properties globalProperties, final String propertyName, Boolean defaultValue) {
+    public static Boolean readBoolean(Properties properties, Properties globalProperties, final String propertyName,
+            Boolean defaultValue) {
         String repr = null;
         if (null != properties) {
             repr = properties.getProperty(propertyName);
@@ -45,7 +54,8 @@ public class PropertyReader {
         return readInt(properties, globalProperties, propertyName, null);
     }
 
-    public static Integer readInt(Properties properties, Properties globalProperties, final String propertyName, Integer defaultValue) {
+    public static Integer readInt(Properties properties, Properties globalProperties, final String propertyName,
+            Integer defaultValue) {
         String repr = null;
         if (null != properties) {
             repr = properties.getProperty(propertyName);
@@ -65,7 +75,8 @@ public class PropertyReader {
         return readLong(properties, globalProperties, propertyName, null);
     }
 
-    public static Long readLong(Properties properties, Properties globalProperties, final String propertyName, Long defaultValue) {
+    public static Long readLong(Properties properties, Properties globalProperties, final String propertyName,
+            Long defaultValue) {
         String repr = null;
         if (null != properties) {
             repr = properties.getProperty(propertyName);
@@ -85,7 +96,8 @@ public class PropertyReader {
         return readString(properties, globalProperties, propertyName, null);
     }
 
-    public static String readString(Properties properties, Properties globalProperties, final String propertyName, String defaultValue) {
+    public static String readString(Properties properties, Properties globalProperties, final String propertyName,
+            String defaultValue) {
         String repr = properties.getProperty(propertyName);
         if (Strings.isNullOrEmpty(repr)) {
             repr = globalProperties.getProperty(propertyName);

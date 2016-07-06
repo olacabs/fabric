@@ -30,8 +30,17 @@ import org.junit.Test;
 import java.util.List;
 import java.util.Random;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 
+/**
+ * TODO javadoc.
+ */
 public class KafkaWriterTest {
 
     private KafkaWriter processor;
@@ -55,16 +64,20 @@ public class KafkaWriterTest {
         ObjectMapper mapper = new ObjectMapper();
         List<String> lst = Lists.newArrayList();
         for (int i = 0; i < 5; i++) {
-            lst.add("{\"firstName\":\"" + "xyz" + rnd.nextInt(10) + "\", \"lastName\":\"Doe" + rnd.nextInt(100) + "\"}");
+            lst.add("{\"firstName\":\"" + "xyz" + rnd.nextInt(10) + "\", \"lastName\":\"Doe" + rnd.nextInt(100)
+                    + "\"}");
 
         }
 
         ProcessorTestBench processorTestBench = new ProcessorTestBench(false);
-        List<EventSet> events = processorTestBench.runStreamingProcessor(processor, ImmutableList.of(EventSet.eventFromEventBuilder()
-            .events(ImmutableList.of(Event.builder().jsonNode(mapper.readTree(lst.get(0))).build(), Event.builder().jsonNode(mapper.readTree(lst.get(0))).build()))
-            .build(), EventSet.eventFromEventBuilder().events(ImmutableList
-            .of(Event.builder().jsonNode(mapper.readTree(lst.get(0))).build(), Event.builder().jsonNode(mapper.readTree(lst.get(0))).build(),
-                Event.builder().jsonNode(mapper.readTree(lst.get(0))).build())).build()));
+        List<EventSet> events = processorTestBench.runStreamingProcessor(processor, ImmutableList
+                .of(EventSet.eventFromEventBuilder().events(ImmutableList
+                                .of(Event.builder().jsonNode(mapper.readTree(lst.get(0))).build(),
+                                        Event.builder().jsonNode(mapper.readTree(lst.get(0))).build())).build(),
+                        EventSet.eventFromEventBuilder().events(ImmutableList
+                                .of(Event.builder().jsonNode(mapper.readTree(lst.get(0))).build(),
+                                        Event.builder().jsonNode(mapper.readTree(lst.get(0))).build(),
+                                        Event.builder().jsonNode(mapper.readTree(lst.get(0))).build())).build()));
 
         verify(producer, times(2)).send(anyList());
 

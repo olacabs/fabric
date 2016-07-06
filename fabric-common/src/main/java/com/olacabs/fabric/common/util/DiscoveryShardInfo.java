@@ -21,6 +21,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ *TODO add doc.
+ */
 @Data
 @Builder
 @AllArgsConstructor

@@ -24,9 +24,12 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * TODO add more.
+ */
 @Builder
 public class KafkaConsumerBuilder {
-    private static final Logger logger = LoggerFactory.getLogger(KafkaConsumerBuilder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumerBuilder.class);
     private static final int BUFFER_SIZE = 2 ^ 20;
 
     private final String brokers;
@@ -43,7 +46,7 @@ public class KafkaConsumerBuilder {
             SimpleConsumer consumer = new SimpleConsumer(leaderHost.getHost(),
                 leaderHost.getPort(), 1000, BUFFER_SIZE, HostUtils.hostname());
             leaderConsumers.put(leader.getKey(), consumer);
-            logger.info("Created consumer for {}:{}", topic, leader.getKey());
+            LOGGER.info("Created consumer for {}:{}", topic, leader.getKey());
         }
         return leaderConsumers;
     }

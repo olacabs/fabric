@@ -23,7 +23,11 @@ import kafka.common.ErrorMapping;
 import kafka.common.OffsetAndMetadata;
 import kafka.common.OffsetMetadataAndError;
 import kafka.common.TopicAndPartition;
-import kafka.javaapi.*;
+import kafka.javaapi.ConsumerMetadataResponse;
+import kafka.javaapi.OffsetCommitRequest;
+import kafka.javaapi.OffsetCommitResponse;
+import kafka.javaapi.OffsetFetchRequest;
+import kafka.javaapi.OffsetFetchResponse;
 import kafka.network.BlockingChannel;
 import lombok.Builder;
 import org.slf4j.Logger;
@@ -35,8 +39,11 @@ import java.util.Map;
 
 import static kafka.common.ErrorMapping.OffsetMetadataTooLargeCode;
 
+/**
+ * TODO Add more.
+ */
 public class KafkaBasedOffsetSource implements OffsetSource {
-    private static final Logger logger = LoggerFactory.getLogger(KafkaBasedOffsetSource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaBasedOffsetSource.class);
 
     private final String brokers;
     private final String topology;
@@ -44,7 +51,7 @@ public class KafkaBasedOffsetSource implements OffsetSource {
     private BlockingChannel channel;
 
     @Builder
-    KafkaBasedOffsetSource(String brokers, String topology, String topic) {
+    public KafkaBasedOffsetSource(String brokers, String topology, String topic) {
         this.brokers = brokers;
         this.topology = topology;
         this.topic = topic;
@@ -52,15 +59,15 @@ public class KafkaBasedOffsetSource implements OffsetSource {
     }
 
     @Override
-    public void saveOffset(String topic, int partition, long offset) throws Exception {
+    public void saveOffset(String topicArg, int partition, long offset) throws Exception {
         while (true) {
             long now = System.currentTimeMillis();
             Map<TopicAndPartition, OffsetAndMetadata> offsets = Maps.newLinkedHashMap();
-            offsets.put(new TopicAndPartition(topic, partition), new OffsetAndMetadata(100L, "", now));
+            offsets.put(new TopicAndPartition(topicArg, partition), new OffsetAndMetadata(100L, "", now));
             OffsetCommitRequest commitRequest = new OffsetCommitRequest(
                 groupId(),
                 offsets,
-                0, //TODO::CORRELATION ID
+                0, //TODO CORRELATION ID.
                 HostUtils.hostname(),
                 (short) 1 /* version */); // version 1 and above commit to Kafka, version 0 commits to ZooKeeper
             try {
@@ -71,12 +78,15 @@ public class KafkaBasedOffsetSource implements OffsetSource {
                         short partitionErrorCode = (Short) partitionErrorCodeRaw;
                         if (partitionErrorCode == OffsetMetadataTooLargeCode()) {
                             // You must reduce the size of the metadata if you wish to retry
-                            //TODO::SAVE META MAP
-                        } else if (partitionErrorCode == ErrorMapping.NotCoordinatorForConsumerCode() || partitionErrorCode == ErrorMapping.ConsumerCoordinatorNotAvailableCode()) {
+                            //TODO SAVE META MAP
+                            LOGGER.debug("TODO::SAVE META MAP");
+                        } else if (partitionErrorCode == ErrorMapping.NotCoordinatorForConsumerCode()
+                                || partitionErrorCode == ErrorMapping.ConsumerCoordinatorNotAvailableCode()) {
                             channel.disconnect();
                             reconnect();
                         } else {
                             //TODO log and retry the commit
+                            LOGGER.debug("TODO log and retry the commit");
                         }
                     }
                 } else {
@@ -90,17 +100,14 @@ public class KafkaBasedOffsetSource implements OffsetSource {
     }
 
     @Override
-    public long startOffset(String topic, int partition) throws Exception {
-        TopicAndPartition testPartition = new TopicAndPartition(topic, partition);
+    public long startOffset(String topicArg, int partition) throws Exception {
+        TopicAndPartition testPartition = new TopicAndPartition(topicArg, partition);
         while (true) {
             List<TopicAndPartition> partitions = new ArrayList<>();
             partitions.add(testPartition);
-            OffsetFetchRequest fetchRequest = new OffsetFetchRequest(
-                groupId(),
-                partitions,
-                (short) 1 /* version */, // version 1 and above fetch from Kafka, version 0 fetches from ZooKeeper
-                0,
-                HostUtils.hostname());
+            OffsetFetchRequest fetchRequest = new OffsetFetchRequest(groupId(), partitions, (short) 1 /* version */,
+                    // version 1 and above fetch from Kafka, version 0 fetches from ZooKeeper
+                    0, HostUtils.hostname());
             try {
                 channel.send(fetchRequest.underlying());
                 OffsetFetchResponse fetchResponse = OffsetFetchResponse.readFrom(channel.receive().buffer());
@@ -113,15 +120,16 @@ public class KafkaBasedOffsetSource implements OffsetSource {
                     channel.disconnect();
                     reconnect();
                     // Go to step 1 and retry the offset fetch
-                } /*else if (offsetFetchErrorCode == ErrorMapping.OffsetsLoadInProgress()) {
+                } else {
+                    /*else if (offsetFetchErrorCode == ErrorMapping.OffsetsLoadInProgress()) {
                 // retry the offset fetch (after backoff)
-            } */ else {
+                */
                     String retrievedMetadata = result.metadata();
                     return result.offset();
                 }
             } catch (Exception e) {
                 channel.disconnect();
-                logger.error("Error fetching offset: ", e);
+                LOGGER.error("Error fetching offset: ", e);
                 // Go to step 1 and then retry offset fetch after backoff
                 reconnect();
             }
@@ -129,8 +137,8 @@ public class KafkaBasedOffsetSource implements OffsetSource {
     }
 
     private void reconnect() {
-        final String MY_GROUP = groupId();
-        final String MY_CLIENTID = HostUtils.hostname();
+        final String myGroup = groupId();
+        final String myClientid = HostUtils.hostname();
         while (true) {
             try {
                 channel = new BlockingChannel("localhost", 9092,
@@ -140,8 +148,11 @@ public class KafkaBasedOffsetSource implements OffsetSource {
                 channel.connect();
                 int correlationId = 0;
 
-                channel.send(new ConsumerMetadataRequest(MY_GROUP, ConsumerMetadataRequest.CurrentVersion(), correlationId++, MY_CLIENTID));
-                ConsumerMetadataResponse metadataResponse = ConsumerMetadataResponse.readFrom(channel.receive().buffer());
+                channel.send(
+                        new ConsumerMetadataRequest(myGroup, ConsumerMetadataRequest.CurrentVersion(), correlationId++,
+                                myClientid));
+                ConsumerMetadataResponse metadataResponse =
+                        ConsumerMetadataResponse.readFrom(channel.receive().buffer());
 
                 if (metadataResponse.errorCode() == ErrorMapping.NoError()) {
                     Broker offsetManager = metadataResponse.coordinator();
@@ -155,10 +166,11 @@ public class KafkaBasedOffsetSource implements OffsetSource {
                     break;
                 } else {
                     // retry (after backoff)
+                    LOGGER.debug("retry (after backoff)");
                 }
             } catch (Exception e) {
                 // retry the query (after backoff)
-                logger.error("Error reconnecting: ", e);
+                LOGGER.error("Error reconnecting: ", e);
             }
         }
     }

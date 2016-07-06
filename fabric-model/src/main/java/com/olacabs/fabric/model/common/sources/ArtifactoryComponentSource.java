@@ -23,6 +23,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * TODO Add more.
+ */
 public class ArtifactoryComponentSource extends ComponentSource {
     @Getter
     @Setter
@@ -45,7 +48,8 @@ public class ArtifactoryComponentSource extends ComponentSource {
     }
 
     @Builder
-    public ArtifactoryComponentSource(final String artifactoryUrl, final String groupId, final String artifactId, final String version) {
+    public ArtifactoryComponentSource(final String artifactoryUrl, final String groupId, final String artifactId,
+            final String version) {
         this();
         this.artifactoryUrl = artifactoryUrl;
         this.groupId = groupId;
@@ -55,14 +59,24 @@ public class ArtifactoryComponentSource extends ComponentSource {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         ArtifactoryComponentSource that = (ArtifactoryComponentSource) o;
 
-        if (!artifactoryUrl.equals(that.artifactoryUrl)) return false;
-        if (!groupId.equals(that.groupId)) return false;
-        if (!artifactId.equals(that.artifactId)) return false;
+        if (!artifactoryUrl.equals(that.artifactoryUrl)) {
+            return false;
+        }
+        if (!groupId.equals(that.groupId)) {
+            return false;
+        }
+        if (!artifactId.equals(that.artifactId)) {
+            return false;
+        }
         return version.equals(that.version);
 
     }

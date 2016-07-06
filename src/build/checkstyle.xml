@@ -118,7 +118,9 @@
             <property name="max" value="120"/>
         </module>
         <module name="MethodLength"/>
-        <module name="ParameterNumber"/>
+        <module name="ParameterNumber">
+            <property name="max" value="10"/>
+        </module>
         <module name="OuterTypeNumber"/>
 
         <!-- Checks for whitespace                               -->
@@ -178,7 +180,6 @@
         <!-- module name="AvoidInlineConditionals"/-->
         <!-- DoubleCheckedLocking check is no longer required. See http://checkstyle.sourceforge.net/releasenotes.html -->
         <!-- module name="DoubleCheckedLocking"/-->
-        <module name="EmptyStatement"/>
         <module name="EqualsHashCode"/>
         <module name="StringLiteralEquality"/>
         <module name="HiddenField">
@@ -219,7 +220,7 @@
         -->
         <module name="Indentation">
             <property name="basicOffset" value="4"/>
-            <property name="caseIndent" value="0"/>
+            <property name="caseIndent" value="4"/>
         </module>
         <module name="TodoComment"/>
         <module name="UpperEll"/>

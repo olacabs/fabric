@@ -16,6 +16,9 @@
 
 package com.olacabs.fabric.model.computation;
 
+/**
+ * TODO Add more.
+ */
 public enum TerminalType {
     SOURCE,
     PROCESSOR

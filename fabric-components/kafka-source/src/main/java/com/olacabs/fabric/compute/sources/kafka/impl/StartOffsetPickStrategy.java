@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
+
 package com.olacabs.fabric.compute.sources.kafka.impl;
 
+/**
+ * TODO java doc.
+ */
 public enum StartOffsetPickStrategy {
     EARLIEST, LATEST
 }

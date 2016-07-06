@@ -17,9 +17,14 @@
 package com.olacabs.fabric.common.util;
 
 /**
- * Helper methods for handling Exceptions
+ * Helper methods for handling Exceptions.
  */
-public class ExceptionHelper {
+public final class ExceptionHelper {
+
+    private ExceptionHelper() {
+
+    }
+
     public static Throwable getLeafThrowable(final Throwable t) {
         Throwable tmp = t;
         Throwable current = t;

@@ -22,6 +22,9 @@ import kafka.utils.VerifiableProperties;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * TODO java doc.
+ */
 public class CustomPartitioner implements Partitioner {
     private Random random = ThreadLocalRandom.current();
 

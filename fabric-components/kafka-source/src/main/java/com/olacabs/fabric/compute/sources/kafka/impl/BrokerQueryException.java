@@ -16,6 +16,9 @@
 
 package com.olacabs.fabric.compute.sources.kafka.impl;
 
+/**
+ * TODO Add more.
+ */
 public class BrokerQueryException extends Exception {
     public BrokerQueryException(String message) {
         super(message);

@@ -18,13 +18,20 @@ package com.olacabs.fabric.model.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.olacabs.fabric.model.processor.ProcessorType;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * TODO add more.
+ */
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -94,8 +101,12 @@ public class ComponentMetadata {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         ComponentMetadata that = (ComponentMetadata) o;
 

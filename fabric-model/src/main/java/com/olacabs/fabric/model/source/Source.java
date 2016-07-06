@@ -21,6 +21,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+/**
+ * TODO add more.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public @interface Source {
