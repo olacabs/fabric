@@ -33,8 +33,11 @@ import org.slf4j.LoggerFactory;
 import java.net.InetAddress;
 import java.util.List;
 
+/**
+ * TODO doc.
+ */
 public class HttpMetadataSource implements MetadataSource {
-    private static final Logger logger = LoggerFactory.getLogger(HttpMetadataSource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpMetadataSource.class);
     private final ObjectMapper mapper;
     private HttpClient httpClient = HttpClients.createDefault();
     private MesosDnsResolver dnsResolver;
@@ -56,11 +59,12 @@ public class HttpMetadataSource implements MetadataSource {
 
             if (!results.isEmpty()) {
                 specHost = InetAddress.getByName(results.get(0).host()).getHostAddress() + ":" + results.get(0).port();
-                logger.info("Setting spec host to: " + specHost);
+                LOGGER.info("Setting spec host to: " + specHost);
             } else {
                 throw new RuntimeException(String.format("Dns Srv Resolution for spec host failed: %s", specHost));
             }
-            specEndpoint = specEndpoint.split("//")[0] + "//" + specHost + "/" + specEndpoint.split("//")[1].replaceFirst(".*\\./", "");
+            specEndpoint = specEndpoint.split("//")[0] + "//" + specHost + "/" + specEndpoint.split("//")[1]
+                    .replaceFirst(".*\\./", "");
         }
         HttpGet getRequest = new HttpGet(specEndpoint);
         HttpResponse response = httpClient.execute(getRequest);
