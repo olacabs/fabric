@@ -18,11 +18,18 @@ package com.olacabs.fabric.compute.comms;
 
 import java.util.Properties;
 
-public class ChannelFactory {
-    public static <EventType> CommsChannel<EventType> create(final Properties properties,
+/**
+ * TODO javadoc.
+ */
+public final class ChannelFactory {
+
+    private ChannelFactory() {
+
+    }
+    public static <E> CommsChannel<E> create(final Properties properties,
                                                              final String name,
                                                              final boolean isSingleProducer,
-                                                             final CommsMessageHandler<EventType> handler) {
+                                                             final CommsMessageHandler<E> handler) {
         String channelType = (String) properties.getOrDefault("computation.channel.channel_type",
             ChannelType.BLOCKING_QUEUE.toString());
         channelType = channelType.trim();
@@ -30,8 +37,10 @@ public class ChannelFactory {
         if (channelType.equalsIgnoreCase(ChannelType.BLOCKING_QUEUE.toString())) {
             return new BlockingQueueCommsChannel<>(name, isSingleProducer, handler);
         } else {
-            int bufferSize = Integer.valueOf((String) properties.getOrDefault("computation.disruptor.buffer_size", "64"));
-            String waitStrategy = (String) properties.getOrDefault("computation.disruptor.wait_strategy", DisruptorWaitStrategy.BLOCK.toString());
+            int bufferSize =
+                    Integer.valueOf((String) properties.getOrDefault("computation.disruptor.buffer_size", "64"));
+            String waitStrategy = (String) properties
+                    .getOrDefault("computation.disruptor.wait_strategy", DisruptorWaitStrategy.BLOCK.toString());
             waitStrategy = waitStrategy.trim();
             waitStrategy = waitStrategy.toLowerCase();
             return new DisruptorCommsChannel<>(name, isSingleProducer, waitStrategy, bufferSize, handler);

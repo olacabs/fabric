@@ -23,16 +23,20 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 
+/**
+ *
+ * TODO add javadoc.
+ */
 @Slf4j
-public class BlockingQueueCommsChannel<EventType> implements CommsChannel<EventType> {
+public class BlockingQueueCommsChannel<E> implements CommsChannel<E> {
     private final String name;
     private final boolean isSingleProducer;
-    private final CommsMessageHandler<EventType> handler;
+    private final CommsMessageHandler<E> handler;
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private LinkedBlockingQueue<CommsFrameworkMessage<EventType>> queue;
+    private LinkedBlockingQueue<CommsFrameworkMessage<E>> queue;
     private Future jobFuture;
 
-    BlockingQueueCommsChannel(String name, boolean isSingleProducer, CommsMessageHandler<EventType> handler) {
+    BlockingQueueCommsChannel(String name, boolean isSingleProducer, CommsMessageHandler<E> handler) {
         this.isSingleProducer = isSingleProducer;
         this.handler = handler;
         this.name = name;
@@ -44,10 +48,10 @@ public class BlockingQueueCommsChannel<EventType> implements CommsChannel<EventT
     }
 
     @Override
-    public void publish(EventType sourceEvent) {
+    public void publish(E sourceEvent) {
         try {
             queue.put(
-                (CommsFrameworkMessage<EventType>) CommsFrameworkMessage.<EventType>builder()
+                (CommsFrameworkMessage<E>) CommsFrameworkMessage.<E>builder()
                     .id(0)
                     .payload(sourceEvent)
                     .source(name)
@@ -62,7 +66,7 @@ public class BlockingQueueCommsChannel<EventType> implements CommsChannel<EventT
         queue = new LinkedBlockingQueue<>(8);
         jobFuture = executorService.submit(() -> {
             while (true) {
-                CommsFrameworkMessage<EventType> message = queue.take();
+                CommsFrameworkMessage<E> message = queue.take();
                 try {
                     handler.handlePipelineMessage(message.getPayload());
                 } catch (Throwable t) {

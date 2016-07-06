@@ -32,27 +32,28 @@ import java.util.Properties;
  */
 public abstract class ProcessorBase {
     @Getter
-    final boolean isScheduled;
+    private final boolean isScheduled;
     @Getter
     @Setter
-    int id;
+    private int id;
 
     protected ProcessorBase(boolean isScheduled) {
         this.isScheduled = isScheduled;
     }
 
     //Called once during initialization
-    abstract public void initialize(String instanceId, Properties globalProperties, Properties initializationProperties,
+    public abstract void initialize(String instanceId, Properties globalProperties, Properties initializationProperties,
                                     ComponentMetadata componentMetadata) throws InitializationException;
 
     //Called for every batch
-    abstract public void process(ProcessingContext context, EventCollector eventCollector, EventSet eventSet) throws ProcessingException;
+    public abstract void process(ProcessingContext context, EventCollector eventCollector, EventSet eventSet)
+            throws ProcessingException;
 
     //The following is called for same data
-    abstract public List<Event> timeTriggerHandler(ProcessingContext context) throws ProcessingException;
+    public abstract List<Event> timeTriggerHandler(ProcessingContext context) throws ProcessingException;
 
     //Called once at the end
-    abstract public void destroy();
+    public abstract void destroy();
 
     public boolean healthcheck() {
         return true;

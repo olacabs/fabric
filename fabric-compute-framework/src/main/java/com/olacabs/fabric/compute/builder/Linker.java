@@ -36,8 +36,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
+/**
+ * TODO javadoc.
+ */
 public class Linker {
-    private static final Logger logger = LoggerFactory.getLogger(Linker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Linker.class);
 
     private static final String DEFAULT_REGISTRY_NAME = "metrics-registry";
 
@@ -79,7 +82,7 @@ public class Linker {
                 throw new RuntimeException(errorMessage, e);
             }
             Preconditions.checkNotNull(source, errorMessage);
-            logger.info("Loaded source: {}:{}:{}",
+            LOGGER.info("Loaded source: {}:{}:{}",
                 meta.getNamespace(), meta.getName(), meta.getVersion());
             PipelineStreamSource sourceStage = PipelineStreamSource.builder()
                 .instanceId(sourceMetadata.getId())
@@ -108,7 +111,7 @@ public class Linker {
                 throw new RuntimeException(errorMessage, e);
             }
             Preconditions.checkNotNull(processorBase, errorMessage);
-            logger.info("Loaded processor: {}:{}:{}",
+            LOGGER.info("Loaded processor: {}:{}:{}",
                 meta.getNamespace(), meta.getName(), meta.getVersion());
 
             PipelineStage stage = PipelineStage.builder()
@@ -124,14 +127,15 @@ public class Linker {
         });
         spec.getConnections().forEach(connection -> {
             switch (connection.getFromType()) {
-                case SOURCE: {
+                case SOURCE:
                     pipeline.connect(sources.get(connection.getFrom()), stages.get(connection.getTo()));
                     break;
-                }
-                case PROCESSOR: {
+
+                case PROCESSOR:
                     pipeline.connect(stages.get(connection.getFrom()), stages.get(connection.getTo()));
                     break;
-                }
+                default: break;
+
             }
         });
         return pipeline;

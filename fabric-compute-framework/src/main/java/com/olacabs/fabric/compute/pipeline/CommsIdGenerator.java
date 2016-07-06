@@ -16,7 +16,15 @@
 
 package com.olacabs.fabric.compute.pipeline;
 
-public class CommsIdGenerator {
+/**
+ * TODO javadoc.
+ */
+public final class CommsIdGenerator {
+
+    private CommsIdGenerator() {
+
+    }
+
     private static int id = 0;
 
     public static int nextId() {

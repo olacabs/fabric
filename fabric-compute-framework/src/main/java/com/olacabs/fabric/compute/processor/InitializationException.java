@@ -16,6 +16,9 @@
 
 package com.olacabs.fabric.compute.processor;
 
+/**
+ * TODO javadoc.
+ */
 public class InitializationException extends Exception {
     public InitializationException() {
     }
@@ -32,7 +35,8 @@ public class InitializationException extends Exception {
         super(cause);
     }
 
-    public InitializationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public InitializationException(String message, Throwable cause, boolean enableSuppression,
+            boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

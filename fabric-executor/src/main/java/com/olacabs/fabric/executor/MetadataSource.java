@@ -18,6 +18,9 @@ package com.olacabs.fabric.executor;
 
 import com.olacabs.fabric.model.computation.ComputationSpec;
 
+/**
+ * TODO doc.
+ */
 public interface MetadataSource {
     ComputationSpec load(final String id) throws Exception;
 }

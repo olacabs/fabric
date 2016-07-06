@@ -32,19 +32,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * doc.
+ */
 @Slf4j
 public class ProcessorTestBenchTest {
     @Test
     public void testRunScheduledProcessor() throws Exception {
         Counter counter = new Counter();
-        List<EventSet> events = new ProcessorTestBench(true).runScheduledProcessor(counter, 1000, 2, Collections.singletonList(
-            EventSet.eventFromEventBuilder()
-                .events(
-                    ImmutableList.of(
-                        Event.builder()
-                            .data(Collections.singletonMap("a", 1))
-                            .build()))
-                .build()));
+        List<EventSet> events = new ProcessorTestBench(true).runScheduledProcessor(counter, 1000, 2, Collections
+                .singletonList(EventSet.eventFromEventBuilder()
+                        .events(ImmutableList.of(Event.builder().data(Collections.singletonMap("a", 1)).build()))
+                        .build()));
         long totalCount = events
             .stream()
             .mapToLong(eventSet -> eventSet.getEvents()

@@ -26,24 +26,28 @@ import org.slf4j.LoggerFactory;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * TODO javadoc.
+ */
 public abstract class StreamingProcessor extends ProcessorBase {
-    private static final Logger logger = LoggerFactory.getLogger(StreamingProcessor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StreamingProcessor.class);
 
     public StreamingProcessor() {
         super(false);
     }
 
-    abstract protected EventSet consume(ProcessingContext context, EventSet eventSet) throws ProcessingException;
+    protected abstract EventSet consume(ProcessingContext context, EventSet eventSet) throws ProcessingException;
 
     @Override
-    public void process(ProcessingContext context, EventCollector eventCollector, EventSet eventSet) throws ProcessingException {
+    public void process(ProcessingContext context, EventCollector eventCollector, EventSet eventSet)
+            throws ProcessingException {
         eventCollector.publish(consume(context, eventSet));
         //context.acknowledge(getId(), eventSet);
     }
 
     @Override
     public final List<Event> timeTriggerHandler(ProcessingContext context) {
-        logger.warn("timeTriggerHandler() called on StreamingProcessor: " + getId());
+        LOGGER.warn("timeTriggerHandler() called on StreamingProcessor: " + getId());
         return Collections.emptyList();
     }
 }

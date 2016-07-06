@@ -21,7 +21,14 @@ import com.olacabs.fabric.model.common.ComponentMetadata;
 
 import java.util.Properties;
 
-public class ComponentPropertyReader {
+/**
+ * TODO doc.
+ */
+public final class ComponentPropertyReader {
+
+    private ComponentPropertyReader() {
+
+    }
 
     public static String readString(Properties properties, Properties global,
                                     final String propertyName, String instanceId, ComponentMetadata componentMetadata) {
@@ -35,8 +42,8 @@ public class ComponentPropertyReader {
         return PropertyReader.readString(properties, global, key, defaultValue);
     }
 
-    public static Integer readInteger(Properties properties, Properties global,
-                                      final String propertyName, String instanceId, ComponentMetadata componentMetadata) {
+    public static Integer readInteger(Properties properties, Properties global, final String propertyName,
+            String instanceId, ComponentMetadata componentMetadata) {
         return readInteger(properties, global, propertyName, instanceId, componentMetadata, null);
     }
 
@@ -59,8 +66,8 @@ public class ComponentPropertyReader {
         return PropertyReader.readLong(properties, global, key, defaultValue);
     }
 
-    public static Boolean readBoolean(Properties properties, Properties global,
-                                      final String propertyName, String instanceId, ComponentMetadata componentMetadata) {
+    public static Boolean readBoolean(Properties properties, Properties global, final String propertyName,
+            String instanceId, ComponentMetadata componentMetadata) {
         return readBoolean(properties, global, propertyName, instanceId, componentMetadata, null);
     }
 

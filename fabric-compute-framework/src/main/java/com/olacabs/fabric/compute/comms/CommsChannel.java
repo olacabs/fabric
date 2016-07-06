@@ -16,6 +16,10 @@
 
 package com.olacabs.fabric.compute.comms;
 
+/**
+ * TODO javadoc.
+ *
+ */
 public interface CommsChannel<EventType> {
 
     String name();

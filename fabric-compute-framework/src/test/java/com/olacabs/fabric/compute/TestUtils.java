@@ -18,7 +18,14 @@ package com.olacabs.fabric.compute;
 
 import java.util.UUID;
 
-public class TestUtils {
+/**
+ * Doc.
+ */
+public final class TestUtils {
+
+    private TestUtils() {
+
+    }
     public static String id() {
         return UUID.randomUUID().toString();
     }

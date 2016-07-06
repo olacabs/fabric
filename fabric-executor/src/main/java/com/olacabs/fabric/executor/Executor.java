@@ -42,7 +42,12 @@ import com.olacabs.fabric.model.common.ComponentSource;
 import com.olacabs.fabric.model.computation.ComputationSpec;
 import io.undertow.Undertow;
 import io.undertow.util.Headers;
-import org.apache.commons.cli.*;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,8 +56,11 @@ import java.net.Inet4Address;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * TODO doc.
+ */
 public class Executor {
-    private static final Logger logger = LoggerFactory.getLogger(Executor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Executor.class);
 
     static {
         java.security.Security.setProperty("networkaddress.cache.ttl", "60");
@@ -77,20 +85,17 @@ public class Executor {
         try {
             new Executor().run(args);
         } catch (Throwable t) {
-            logger.error("Executor will exit...", t);
+            LOGGER.error("Executor will exit...", t);
         }
     }
 
     public void startMonitor(final ComputationPipeline pipeline) {
-        healthcheckMonitor = Undertow.builder()
-            .addHttpListener(8080, "0.0.0.0")
-            .setHandler(exchange -> {
-                    boolean result = pipeline.healthcheck();
-                    exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
-                    exchange.setStatusCode(result ? HttpStatus.SC_OK : HttpStatus.SC_INTERNAL_SERVER_ERROR);
-                    exchange.getResponseSender().send(result ? "alive" : "dead");
-                }
-            ).build();
+        healthcheckMonitor = Undertow.builder().addHttpListener(8080, "0.0.0.0").setHandler(exchange -> {
+            boolean result = pipeline.healthcheck();
+            exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
+            exchange.setStatusCode(result ? HttpStatus.SC_OK : HttpStatus.SC_INTERNAL_SERVER_ERROR);
+            exchange.getResponseSender().send(result ? "alive" : "dead");
+        })  .build();
         healthcheckMonitor.start();
     }
 
@@ -137,7 +142,7 @@ public class Executor {
 
         if (commandLine.hasOption("m")) {
             if (!commandLine.getOptionValue("m").equalsIgnoreCase("NIL")) {
-                String tokens[] = commandLine.getOptionValue("m").split(":");
+                String[] tokens = commandLine.getOptionValue("m").split(":");
                 if (tokens.length > 2) {
                     throw new Exception("Cannot parse opentsdb connection string");
                 } else {
@@ -146,12 +151,12 @@ public class Executor {
                         opentsdbPort = Integer.valueOf(tokens[1]);
                     }
                 }
-                logger.info("Setting opentsdb endpoint to {}:{}", opentsdbHost, opentsdbPort);
+                LOGGER.info("Setting opentsdb endpoint to {}:{}", opentsdbHost, opentsdbPort);
             }
         }
 
         if (Strings.isNullOrEmpty(opentsdbHost)) {
-            logger.warn("No metrics data available");
+            LOGGER.warn("No metrics data available");
         }
 
         MetadataSource metadataSource = metadataSource(commandLine);
@@ -161,16 +166,17 @@ public class Executor {
         DownloadingLoader loader = new DownloadingLoader();
         ImmutableSet.Builder<ComponentSource> componentSourceSetBuilder = ImmutableSet.builder();
         spec.getSources().forEach(sourceMeta -> componentSourceSetBuilder.add(sourceMeta.getMeta().getSource()));
-        spec.getProcessors().forEach(processorMeta -> componentSourceSetBuilder.add(processorMeta.getMeta().getSource()));
+        spec.getProcessors()
+                .forEach(processorMeta -> componentSourceSetBuilder.add(processorMeta.getMeta().getSource()));
         Collection<String> resolvedUrls = ComponentUrlResolver.urls(componentSourceSetBuilder.build());
-        logger.info("Component Jar URLs: {}", resolvedUrls);
+        LOGGER.info("Component Jar URLs: {}", resolvedUrls);
 
         loader.loadJars(resolvedUrls, Thread.currentThread().getContextClassLoader());
         MetricRegistry registry = SharedMetricRegistries.getOrCreate("metrics-registry");
 
         Linker linker = new Linker(loader, registry);
 
-        logger.info(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(spec));
+        LOGGER.info(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(spec));
         ComputationPipeline pipeline = linker.build(spec);
 
         String host;
@@ -179,7 +185,7 @@ public class Executor {
         } else {
             host = Inet4Address.getLocalHost().getHostAddress();
         }
-        logger.info("Setting container host to: " + host);
+        LOGGER.info("Setting container host to: " + host);
 
         boolean metricsDisabled = true;
         if (commandLine.hasOption("d")) {
@@ -192,7 +198,8 @@ public class Executor {
             registry.register("threads", new ThreadStatesGaugeSet());
             registry.register("fd", new FileDescriptorRatioGauge());
             if (!Strings.isNullOrEmpty(opentsdbHost)) {
-                long interval = (null != System.getenv("OPENTSDB_REPORTER_INTERVAL")) ? Long.valueOf(System.getenv("OPENTSDB_REPORTER_INTERVAL")) : 60L;
+                long interval = (null != System.getenv("OPENTSDB_REPORTER_INTERVAL")) ? Long
+                        .valueOf(System.getenv("OPENTSDB_REPORTER_INTERVAL")) : 60L;
                 OpenTsdbReporter.forRegistry(registry)
                     .prefixedWith(spec.getName())
                     .convertRatesTo(TimeUnit.SECONDS)
@@ -201,7 +208,7 @@ public class Executor {
                     .build(OpenTsdb.forService(String.format("http://%s:%d", opentsdbHost, opentsdbPort)).create())
                     .start(interval, TimeUnit.SECONDS);
             } else {
-                logger.warn("Using console reporter");
+                LOGGER.warn("Using console reporter");
                 ConsoleReporter.forRegistry(registry)
                     .convertDurationsTo(TimeUnit.MILLISECONDS)
                     .convertRatesTo(TimeUnit.SECONDS)
@@ -210,21 +217,21 @@ public class Executor {
                     .start(60L, TimeUnit.SECONDS);
             }
         } else {
-            logger.warn("Metrics disabled...");
+            LOGGER.warn("Metrics disabled...");
         }
 
         try {
             pipeline.initialize(spec.getProperties())
                 .start();
         } catch (Throwable t) {
-            logger.error("Couldn't start computation...", t);
+            LOGGER.error("Couldn't start computation...", t);
             System.exit(-1);
         }
 
         startMonitor(pipeline);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            logger.info("Got shutdown signal, shutting down the computation");
+            LOGGER.info("Got shutdown signal, shutting down the computation");
             pipeline.stop();
             stopMonitor();
         }));

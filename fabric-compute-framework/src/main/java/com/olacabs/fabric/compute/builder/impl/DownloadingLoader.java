@@ -27,6 +27,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * TODO javadoc.
+ */
 public class DownloadingLoader implements Loader {
     private static final Comparator<ComponentMetadata> METADATA_COMPARATOR
         = (lhs, rhs) -> String.format("%s:%s:%s", lhs.getNamespace(), lhs.getName(), lhs.getVersion())
@@ -72,24 +75,27 @@ public class DownloadingLoader implements Loader {
     private void handleScanResult(JarScanner.ScanResult scanResult) {
         switch (scanResult.getMetadata().getType()) {
 
-            case PROCESSOR: {
+            case PROCESSOR:
                 try {
-                    ProcessorBase processorInstance = (ProcessorBase) scanResult.getComponentClass().getDeclaredConstructor().newInstance();
+                    ProcessorBase processorInstance =
+                            (ProcessorBase) scanResult.getComponentClass().getDeclaredConstructor().newInstance();
                     registeredProcessors.put(scanResult.getMetadata(), processorInstance);
                 } catch (Exception e) {
                     throw new RuntimeException("Error creating processor: ", e);
                 }
                 break;
-            }
-            case SOURCE: {
+
+            case SOURCE:
                 try {
-                    PipelineSource sourceInstance = (PipelineSource) scanResult.getComponentClass().getDeclaredConstructor().newInstance();
+                    PipelineSource sourceInstance =
+                            (PipelineSource) scanResult.getComponentClass().getDeclaredConstructor().newInstance();
                     registeredSources.put(scanResult.getMetadata(), sourceInstance);
                 } catch (Exception e) {
                     throw new RuntimeException("Error creating processor: ", e);
                 }
                 break;
-            }
+
+            default:break;
         }
     }
 }

@@ -16,6 +16,9 @@
 
 package com.olacabs.fabric.compute.processor;
 
+/**
+ * TODO javadoc.
+ */
 public class ProcessingException extends Exception {
     public ProcessingException() {
     }

@@ -23,6 +23,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * TODO javadoc.
+ */
 public class ClockPulseGenerator {
     private final int id;
     private final long notificationPeriod;
@@ -39,8 +42,9 @@ public class ClockPulseGenerator {
     }
 
     public void start() {
-        clockFuture = executorService.scheduleAtFixedRate(
-            () -> notificationBus.publish(PipelineMessage.timerMessageBuilder(), id), notificationPeriod, notificationPeriod, TimeUnit.MILLISECONDS);
+        clockFuture = executorService
+                .scheduleAtFixedRate(() -> notificationBus.publish(PipelineMessage.timerMessageBuilder(), id),
+                        notificationPeriod, notificationPeriod, TimeUnit.MILLISECONDS);
     }
 
     public void stop() {

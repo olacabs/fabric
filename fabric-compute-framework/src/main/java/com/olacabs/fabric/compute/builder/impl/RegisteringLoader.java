@@ -25,6 +25,9 @@ import lombok.Singular;
 
 import java.util.Map;
 
+/**
+ * TODO javadoc.
+ */
 @Builder
 public class RegisteringLoader implements Loader {
     @Singular

@@ -31,6 +31,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+/**
+ * TODO doc.
+ */
 public class CountingProcessor extends ScheduledProcessor {
     private Map<String, Long> counts = Maps.newHashMap();
 

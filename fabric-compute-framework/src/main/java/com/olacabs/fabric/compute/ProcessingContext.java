@@ -23,6 +23,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
+/**
+ * TODO javadoc.
+ */
 @Data
 @Builder
 @NoArgsConstructor

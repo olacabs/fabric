@@ -40,24 +40,26 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Set;
 
+/**
+ * TODO javadoc.
+ */
 public class HttpFileDownloader {
-    private static final Logger logger = LoggerFactory.getLogger(HttpFileDownloader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpFileDownloader.class);
 
     private final String tmpDirectory;
     private final CloseableHttpClient httpClient;
 
 
     public HttpFileDownloader(final String namePrefix) throws Exception {
-        FileAttribute<Set<PosixFilePermission>> perms = PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwxr-xr-x"));
+        FileAttribute<Set<PosixFilePermission>> perms =
+                PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwxr-xr-x"));
         Path createdPath = Files.createTempDirectory(namePrefix, perms);
         this.tmpDirectory = createdPath.toAbsolutePath().toString();
 
         PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
         cm.setMaxTotal(20);
 
-        httpClient = HttpClients.custom()
-            .setConnectionManager(cm)
-            .build();
+        httpClient = HttpClients.custom().setConnectionManager(cm).build();
     }
 
     public Path download(final String url) {
@@ -99,7 +101,7 @@ public class HttpFileDownloader {
                 try {
                     response.close();
                 } catch (IOException e) {
-                    logger.error("Could not close connection to server: ", e);
+                    LOGGER.error("Could not close connection to server: ", e);
                 }
             }
         }

@@ -16,7 +16,12 @@
 
 package com.olacabs.fabric.compute;
 
-import com.codahale.metrics.*;
+import com.codahale.metrics.ConsoleReporter;
+import com.codahale.metrics.CsvReporter;
+import com.codahale.metrics.MetricFilter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.ScheduledReporter;
+import com.codahale.metrics.SharedMetricRegistries;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -34,16 +39,19 @@ import java.io.File;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Doc.
+ */
 @Slf4j
 public class PipelineTestBench {
 
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final ScheduledReporter reporter;
     private final MetricRegistry metricRegistry;
 
     /**
-     * A constructor for getting an instance of {@code PipelineTestBench}
+     * A constructor for getting an instance of {@code PipelineTestBench}.
      */
     public PipelineTestBench() {
         metricRegistry = SharedMetricRegistries.getOrCreate("metrics-registry");
@@ -56,7 +64,7 @@ public class PipelineTestBench {
     }
 
     /**
-     * A constructor for getting an instance of {@code PipelineTestBench} that writes metrics to a csv file
+     * A constructor for getting an instance of {@code PipelineTestBench} that writes metrics to a csv file.
      *
      * @param dirPath The relative or absolute path of the directory to place csv files for each metric
      */
@@ -64,7 +72,8 @@ public class PipelineTestBench {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(dirPath),
             "Provide a non-null and non-empty filePath");
         File dir = new File(dirPath);
-        Preconditions.checkArgument(dir.exists() || dir.mkdirs(), "Provide a directory path which either exists or can be created");
+        Preconditions.checkArgument(dir.exists() || dir.mkdirs(),
+                "Provide a directory path which either exists or can be created");
         metricRegistry = SharedMetricRegistries.getOrCreate("metrics-registry");
         reporter = CsvReporter.forRegistry(metricRegistry)
             .convertRatesTo(TimeUnit.SECONDS)
@@ -91,19 +100,23 @@ public class PipelineTestBench {
         DownloadingLoader loader = new DownloadingLoader();
         ImmutableSet.Builder<ComponentSource> componentSourceSetBuilder = ImmutableSet.builder();
         spec.getSources().forEach(sourceMeta -> componentSourceSetBuilder.add(sourceMeta.getMeta().getSource()));
-        spec.getProcessors().forEach(processorMeta -> componentSourceSetBuilder.add(processorMeta.getMeta().getSource()));
+        spec.getProcessors()
+                .forEach(processorMeta -> componentSourceSetBuilder.add(processorMeta.getMeta().getSource()));
         Collection<String> resolvedUrls = ComponentUrlResolver.urls(componentSourceSetBuilder.build());
         loader.loadJars(resolvedUrls, Thread.currentThread().getContextClassLoader());
         log.info("Component Jar URLs: {}", resolvedUrls);
 
         Linker linker = new Linker(loader, metricRegistry);
 
-        log.info(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(spec));
+        log.info(MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(spec));
         ComputationPipeline pipeline = linker.build(spec);
         startReporter();
         return new PipelineWrapper(reporter, pipeline.initialize(spec.getProperties()).start());
     }
 
+    /**
+     * doc.
+     */
     @AllArgsConstructor
     public static class PipelineWrapper {
         private final ScheduledReporter reporter;
