@@ -18,6 +18,9 @@ package com.olacabs.fabric.compute.pipeline;
 
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * TODO javadoc.
+ */
 public class SourceIdBasedTransactionIdGenerator implements TransactionIdGenerator {
     private final MessageSource messageSource;
     private AtomicLong transactionId = new AtomicLong(0L);

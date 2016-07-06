@@ -20,6 +20,9 @@ import com.olacabs.fabric.model.common.ComponentMetadata;
 
 import java.nio.file.Path;
 
+/**
+ * TODO javadoc.
+ */
 public interface JarDownloader {
     Path download(final ComponentMetadata componentMetadata) throws Exception;
 }

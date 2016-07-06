@@ -19,6 +19,9 @@ package com.olacabs.fabric.compute;
 import com.olacabs.fabric.model.event.EventSet;
 import lombok.Data;
 
+/**
+ * TODO javadoc.
+ */
 @Data
 public class EventCollector {
     private ProcessingContext processingContext;
@@ -32,8 +35,8 @@ public class EventCollector {
         this.processingContext = processingContext;
     }
 
-    public void publish(EventSet events) {
-        this.events = events;
+    public void publish(EventSet eventSet) {
+        this.events = eventSet;
     }
 
 }

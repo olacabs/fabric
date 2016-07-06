@@ -27,7 +27,12 @@ import com.github.rholder.retry.WaitStrategies;
 import com.google.common.collect.Maps;
 import com.olacabs.fabric.common.util.PropertyReader;
 import com.olacabs.fabric.compute.ProcessingContext;
-import com.olacabs.fabric.compute.pipeline.*;
+import com.olacabs.fabric.compute.pipeline.CommsIdGenerator;
+import com.olacabs.fabric.compute.pipeline.MessageSource;
+import com.olacabs.fabric.compute.pipeline.NotificationBus;
+import com.olacabs.fabric.compute.pipeline.PipelineMessage;
+import com.olacabs.fabric.compute.pipeline.SourceIdBasedTransactionIdGenerator;
+import com.olacabs.fabric.compute.pipeline.TransactionIdGenerator;
 import com.olacabs.fabric.model.common.ComponentMetadata;
 import com.olacabs.fabric.model.event.EventSet;
 import com.olacabs.fabric.model.event.RawEventBundle;
@@ -38,13 +43,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
+/**
+ * TODO doc.
+ */
 @Metrics
 public class PipelineStreamSource implements MessageSource {
-    private static final Logger logger = LoggerFactory.getLogger(PipelineStreamSource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PipelineStreamSource.class);
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 
@@ -106,8 +119,10 @@ public class PipelineStreamSource implements MessageSource {
     }
 
     public void initialize(Properties globalProperties) throws Exception {
-        final Integer count = PropertyReader.readInt(this.properties, globalProperties, "computation.eventset.in_flight_count", 5);
-        jsonConversion = PropertyReader.readBoolean(this.properties, globalProperties, "computation.eventset.is_serialized", true);
+        final Integer count =
+                PropertyReader.readInt(this.properties, globalProperties, "computation.eventset.in_flight_count", 5);
+        jsonConversion = PropertyReader
+                .readBoolean(this.properties, globalProperties, "computation.eventset.is_serialized", true);
         delivered = new LinkedBlockingQueue<>(count);
         messages = Maps.newConcurrentMap();
         source.initialize(instanceId, globalProperties, properties, processingContext, sourceMetadata);
@@ -120,23 +135,24 @@ public class PipelineStreamSource implements MessageSource {
     }
 
     @Timed(name = "${this.instanceId}.acks")
-    synchronized public void ackMessage(EventSet eventSet) {
+     public synchronized void ackMessage(EventSet eventSet) {
         if (!messages.containsKey(eventSet.getId())) {
-            logger.error("[{}] Event set {} has already been acked. Maybe the topology is weird!!", sourceMetadata.getName(), eventSet.getId());
+            LOGGER.error("[{}] Event set {} has already been acked. Maybe the topology is weird!!",
+                    sourceMetadata.getName(), eventSet.getId());
             return;
         }
         EventSet minMessage = delivered.peek();
         if (null == minMessage) {
-            logger.error("[{}] There are no unacked message!! This is impossible!!", sourceMetadata.getName());
+            LOGGER.error("[{}] There are no unacked message!! This is impossible!!", sourceMetadata.getName());
             return;
         }
         if (minMessage.getId() != eventSet.getId()) {
-            logger.error("[{}] Got an out of bound message. Acceptable: {} Got: {}",
-                sourceMetadata.getName(), minMessage.getId(), eventSet.getId());
+            LOGGER.error("[{}] Got an out of bound message. Acceptable: {} Got: {}", sourceMetadata.getName(),
+                    minMessage.getId(), eventSet.getId());
             return;
         }
         minMessage = delivered.poll();
-        logger.debug("Acked messageset: {} Partition id: {}", minMessage.getId(), minMessage.getPartitionId());
+        LOGGER.debug("Acked messageset: {} Partition id: {}", minMessage.getId(), minMessage.getPartitionId());
         messages.remove(eventSet.getId());
         source.ack(RawEventBundle.builder()
             .events(minMessage.getEvents())
@@ -151,7 +167,7 @@ public class PipelineStreamSource implements MessageSource {
             try {
                 generateMessage();
             } catch (Exception e) {
-                logger.error("Error thrown by source while generating message: ", e);
+                LOGGER.error("Error thrown by source while generating message: ", e);
             }
             return null;
         });
@@ -184,7 +200,7 @@ public class PipelineStreamSource implements MessageSource {
                                 event.setJsonNode(objectMapper.valueToTree(event.getData()));
                             }
                         } catch (Throwable t) {
-                            logger.error("error generating json payload: ", t);
+                            LOGGER.error("error generating json payload: ", t);
                         }
                     }
                 });
@@ -206,7 +222,7 @@ public class PipelineStreamSource implements MessageSource {
                     id);
 
             } catch (Exception e) {
-                logger.error("Blocked exception while reading message: ", e);
+                LOGGER.error("Blocked exception while reading message: ", e);
             }
         }
     }
@@ -215,6 +231,6 @@ public class PipelineStreamSource implements MessageSource {
         return source.healthcheck();
     }
 
-    //TODO::MAYBE WE SHOULD MOVE THE ABOVE TO A THREAD AND HAVE A STOP HERE
+    //TODO MAYBE WE SHOULD MOVE THE ABOVE TO A THREAD AND HAVE A STOP HERE
 
 }

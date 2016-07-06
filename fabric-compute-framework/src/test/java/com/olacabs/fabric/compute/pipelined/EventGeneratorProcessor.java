@@ -27,6 +27,9 @@ import com.olacabs.fabric.model.event.EventSet;
 import java.util.Collections;
 import java.util.Properties;
 
+/**
+ * TODO doc.
+ */
 public class EventGeneratorProcessor extends StreamingProcessor {
     @Override
     protected EventSet consume(ProcessingContext context, EventSet eventSet) throws ProcessingException {
@@ -38,7 +41,8 @@ public class EventGeneratorProcessor extends StreamingProcessor {
     }
 
     @Override
-    public void initialize(String instanceId, Properties globalProperties, Properties initializationProperties, ComponentMetadata componentMetadata) throws InitializationException {
+    public void initialize(String instanceId, Properties globalProperties, Properties initializationProperties,
+            ComponentMetadata componentMetadata) throws InitializationException {
 
     }
 

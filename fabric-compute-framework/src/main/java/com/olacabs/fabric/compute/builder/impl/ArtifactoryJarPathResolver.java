@@ -31,52 +31,49 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Set;
 
-public class ArtifactoryJarPathResolver {
-    private static final Logger logger = LoggerFactory.getLogger(ArtifactoryJarPathResolver.class);
+/**
+ * TODO javadoc.
+ */
+public final class ArtifactoryJarPathResolver {
 
-    public static String resolve(final String artifactoryUrl, final String groupId, final String artifactId, final String version) throws Exception {
+    private ArtifactoryJarPathResolver() {
+
+    }
+    private static final Logger LOGGER = LoggerFactory.getLogger(ArtifactoryJarPathResolver.class);
+
+    public static String resolve(final String artifactoryUrl, final String groupId, final String artifactId,
+            final String version) throws Exception {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(artifactoryUrl), "Artifactory URL cannot be null");
         Preconditions.checkArgument(!Strings.isNullOrEmpty(groupId), "Group Id cannot be null");
         Preconditions.checkArgument(!Strings.isNullOrEmpty(artifactId), "Artifact Id cannot be null");
         Preconditions.checkArgument(!Strings.isNullOrEmpty(version), "Artifact version cannot be null");
         boolean isSnapshot = version.contains("SNAPSHOT");
-        logger.info("Artifact is snapshot: {}", isSnapshot);
+        LOGGER.info("Artifact is snapshot: {}", isSnapshot);
         final String repoName = isSnapshot ? "libs-snapshot-local" : "libs-release-local";
 
         Artifactory client = ArtifactoryClient.create(artifactoryUrl);
-        logger.info("Aritifactory client created successfully with uri {}", client.getUri());
-        FileAttribute<Set<PosixFilePermission>> perms = PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwxr-xr-x"));
+        LOGGER.info("Aritifactory client created successfully with uri {}", client.getUri());
+        FileAttribute<Set<PosixFilePermission>> perms =
+                PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwxr-xr-x"));
         java.nio.file.Path tempFilePath = Files.createTempFile(Long.toString(System.currentTimeMillis()), "xml", perms);
         String metadataStr = null;
         if (isSnapshot) {
-            metadataStr = String.format("%s/%s/%s/maven-metadata.xml",
-                groupId.replaceAll("\\.", "/"),
-                artifactId,
-                version);
+            metadataStr =
+                    String.format("%s/%s/%s/maven-metadata.xml", groupId.replaceAll("\\.", "/"), artifactId, version);
         } else {
-            metadataStr = String.format("%s/%s/maven-metadata.xml",
-                groupId.replaceAll("\\.", "/"),
-                artifactId);
+            metadataStr = String.format("%s/%s/maven-metadata.xml", groupId.replaceAll("\\.", "/"), artifactId);
         }
 
-        logger.info("Repo-name - {}, metadataStr - {}", repoName, metadataStr);
-        InputStream response = client.repository(repoName)
-            .download(metadataStr)
-            .doDownload();
-        logger.info("download complete");
-        Files.copy(response,
-            tempFilePath, StandardCopyOption.REPLACE_EXISTING);
-        logger.info("Metadata file downloaded to: {}", tempFilePath.toAbsolutePath().toString());
+        LOGGER.info("Repo-name - {}, metadataStr - {}", repoName, metadataStr);
+        InputStream response = client.repository(repoName).download(metadataStr).doDownload();
+        LOGGER.info("download complete");
+        Files.copy(response, tempFilePath, StandardCopyOption.REPLACE_EXISTING);
+        LOGGER.info("Metadata file downloaded to: {}", tempFilePath.toAbsolutePath().toString());
 
-        final String url = String.format("%s/%s/%s/%s/%s/%s-%s.jar",
-            artifactoryUrl,
-            repoName,
-            groupId.replaceAll("\\.", "/"),
-            artifactId,
-            version,
-            artifactId,
-            version);
-        logger.info("Jar will be downloaded from: " + url);
+        final String url =
+                String.format("%s/%s/%s/%s/%s/%s-%s.jar", artifactoryUrl, repoName, groupId.replaceAll("\\.", "/"),
+                        artifactId, version, artifactId, version);
+        LOGGER.info("Jar will be downloaded from: " + url);
         return url;
     }
 

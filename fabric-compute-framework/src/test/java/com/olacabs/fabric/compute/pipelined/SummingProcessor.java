@@ -28,6 +28,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
+/**
+ * TODO doc.
+ */
 public class SummingProcessor extends ScheduledProcessor {
     private long count = 0L;
 

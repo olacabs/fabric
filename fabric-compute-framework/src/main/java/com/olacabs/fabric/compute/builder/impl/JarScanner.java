@@ -39,8 +39,11 @@ import java.net.URLClassLoader;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * TODO javadoc.
+ */
 public class JarScanner {
-    private static final Logger logger = LoggerFactory.getLogger(DownloadingLoader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DownloadingLoader.class);
 
     private final HttpFileDownloader downloader;
 
@@ -82,7 +85,7 @@ public class JarScanner {
             } catch (MalformedURLException e) {
                 throw new RuntimeException(e);
             }
-        }).collect(Collectors.toCollection(ArrayList::new));
+        })  .collect(Collectors.toCollection(ArrayList::new));
         return downloadedURLs.toArray(new URL[downloadedURLs.size()]);
     }
 
@@ -91,7 +94,8 @@ public class JarScanner {
             .addClassLoader(classLoader)
             .addScanners(new SubTypesScanner(), new TypeAnnotationsScanner())
             .addUrls(downloadedUrls));
-        Set<Class<?>> processors = Sets.intersection(reflections.getTypesAnnotatedWith(Processor.class), reflections.getSubTypesOf(ProcessorBase.class));
+        Set<Class<?>> processors = Sets.intersection(reflections.getTypesAnnotatedWith(Processor.class),
+                reflections.getSubTypesOf(ProcessorBase.class));
 
         return processors.stream().map(processor -> {
             Processor processorInfo = processor.getAnnotation(Processor.class);
@@ -120,7 +124,8 @@ public class JarScanner {
             .addClassLoader(classLoader)
             .addScanners(new SubTypesScanner(), new TypeAnnotationsScanner())
             .addUrls(downloadedUrls));
-        Set<Class<?>> sources = Sets.intersection(reflections.getTypesAnnotatedWith(Source.class), reflections.getSubTypesOf(PipelineSource.class));
+        Set<Class<?>> sources = Sets.intersection(reflections.getTypesAnnotatedWith(Source.class),
+                reflections.getSubTypesOf(PipelineSource.class));
         return sources.stream().map(source -> {
             Source sourceInfo = source.getAnnotation(Source.class);
             ComponentMetadata metadata = ComponentMetadata.builder()
@@ -143,6 +148,9 @@ public class JarScanner {
         }).collect(Collectors.toCollection(ArrayList::new));
     }
 
+    /**
+     * Scan result class.
+     */
     @Builder
     @Data
     public static class ScanResult {

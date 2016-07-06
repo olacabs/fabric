@@ -32,13 +32,16 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 
+/**
+ * TODO doc.
+ */
 @Slf4j
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class MemoryBasedPipelineStreamPipelineSource implements PipelineSource {
     private final Random random = new Random();
-    int i = 0;
+    private int i = 0;
     private int maxEmitCount = 10;
     private List<Event> events = ImmutableList.<Event>builder()
         .add(new TestEvent("A", 1))

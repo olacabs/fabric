@@ -16,7 +16,14 @@
 
 package com.olacabs.fabric.compute.comms;
 
-import com.lmax.disruptor.*;
+import com.lmax.disruptor.BlockingWaitStrategy;
+import com.lmax.disruptor.BusySpinWaitStrategy;
+import com.lmax.disruptor.LiteBlockingWaitStrategy;
+import com.lmax.disruptor.RingBuffer;
+import com.lmax.disruptor.SleepingWaitStrategy;
+import com.lmax.disruptor.TimeoutBlockingWaitStrategy;
+import com.lmax.disruptor.WaitStrategy;
+import com.lmax.disruptor.YieldingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import lombok.Getter;
@@ -29,24 +36,27 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+/**
+ *TODO javadoc.
+ */
 @Slf4j
 @Setter
 @Getter
-public class DisruptorCommsChannel<EventType> implements CommsChannel<EventType> {
-    private static final Logger logger = LoggerFactory.getLogger(BlockingQueueCommsChannel.class);
+public class DisruptorCommsChannel<E> implements CommsChannel<E> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BlockingQueueCommsChannel.class);
 
     private final String name;
     private final boolean isSingleProducer;
-    private final CommsMessageHandler<EventType> handler;
+    private final CommsMessageHandler<E> handler;
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
     private int bufferSize;
-    private Disruptor<CommsFrameworkMessage<EventType>> disruptor;
+    private Disruptor<CommsFrameworkMessage<E>> disruptor;
 
     public DisruptorCommsChannel(final String name,
                                  final boolean isSingleProducer,
                                  final String waitStrategy,
                                  final int bufferSize,
-                                 final CommsMessageHandler<EventType> handler) {
+                                 final CommsMessageHandler<E> handler) {
         this.isSingleProducer = isSingleProducer;
         this.handler = handler;
         this.name = name;
@@ -79,13 +89,13 @@ public class DisruptorCommsChannel<EventType> implements CommsChannel<EventType>
                 waitStrategy1 = new SleepingWaitStrategy();
         }
         if (isSingleProducer) {
-            this.disruptor = new Disruptor<>(CommsFrameworkMessage<EventType>::new,
+            this.disruptor = new Disruptor<>(CommsFrameworkMessage<E>::new,
                 bufferSize,
                 executorService,
                 ProducerType.SINGLE,
                 waitStrategy1);
         } else {
-            this.disruptor = new Disruptor<>(CommsFrameworkMessage<EventType>::new,
+            this.disruptor = new Disruptor<>(CommsFrameworkMessage<E>::new,
                 bufferSize,
                 executorService,
                 ProducerType.MULTI,
@@ -99,9 +109,9 @@ public class DisruptorCommsChannel<EventType> implements CommsChannel<EventType>
     }
 
     @Override
-    public void publish(final EventType sourceEvent) {
+    public void publish(final E sourceEvent) {
         try {
-            RingBuffer<CommsFrameworkMessage<EventType>> ringBuffer = disruptor.getRingBuffer();
+            RingBuffer<CommsFrameworkMessage<E>> ringBuffer = disruptor.getRingBuffer();
             ringBuffer.publishEvent((event, sequence) -> {
                 event.setId(sequence);
                 event.setSource(name);

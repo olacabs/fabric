@@ -27,9 +27,12 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 
+/**
+ * TODO javadoc.
+ */
 public class ComponentUrlResolver implements ComponentSourceVisitor {
 
-    private static Logger logger = LoggerFactory.getLogger(ComponentUrlResolver.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ComponentUrlResolver.class);
     private ImmutableSet.Builder<String> listBuilder = ImmutableSet.builder();
 
     public static Collection<String> urls(Collection<ComponentSource> sources) {
@@ -41,18 +44,14 @@ public class ComponentUrlResolver implements ComponentSourceVisitor {
     @Override
     public void visit(ArtifactoryComponentSource artifactoryComponentSource) {
         try {
-            logger.info("Resolving artifactory url with {} , {}, {}, {}", artifactoryComponentSource.getArtifactoryUrl(),
-                artifactoryComponentSource.getGroupId(),
-                artifactoryComponentSource.getArtifactId(),
-                artifactoryComponentSource.getVersion());
-            listBuilder.add(
-                ArtifactoryJarPathResolver.resolve(
-                    artifactoryComponentSource.getArtifactoryUrl(),
-                    artifactoryComponentSource.getGroupId(),
-                    artifactoryComponentSource.getArtifactId(),
-                    artifactoryComponentSource.getVersion()));
+            LOGGER.info("Resolving artifactory url with {} , {}, {}, {}",
+                    artifactoryComponentSource.getArtifactoryUrl(), artifactoryComponentSource.getGroupId(),
+                    artifactoryComponentSource.getArtifactId(), artifactoryComponentSource.getVersion());
+            listBuilder.add(ArtifactoryJarPathResolver
+                    .resolve(artifactoryComponentSource.getArtifactoryUrl(), artifactoryComponentSource.getGroupId(),
+                            artifactoryComponentSource.getArtifactId(), artifactoryComponentSource.getVersion()));
         } catch (Exception e) {
-            logger.error("Runtime Exception  ", e);
+            LOGGER.error("Runtime Exception  ", e);
             throw new RuntimeException(e);
         }
     }
