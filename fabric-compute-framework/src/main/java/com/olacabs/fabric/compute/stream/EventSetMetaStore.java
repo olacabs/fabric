@@ -20,6 +20,9 @@ import com.olacabs.fabric.model.event.EventSetMeta;
 
 import java.util.Collection;
 
+/**
+ * TODO doc.
+ */
 public interface EventSetMetaStore {
     void save(EventSetMeta eventSetMeta);
 

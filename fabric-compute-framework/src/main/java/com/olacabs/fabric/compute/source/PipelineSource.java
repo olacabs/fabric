@@ -23,6 +23,9 @@ import com.olacabs.fabric.model.event.RawEventBundle;
 
 import java.util.Properties;
 
+/**
+ * TODO doc.
+ */
 public interface PipelineSource {
 
     void initialize(String instanceId, Properties globalProperties, Properties properties,

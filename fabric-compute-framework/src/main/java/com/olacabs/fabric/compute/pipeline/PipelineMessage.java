@@ -20,6 +20,9 @@ import com.olacabs.fabric.model.event.EventSet;
 import lombok.Builder;
 import lombok.Getter;
 
+/**
+ * TODO javadoc.
+ */
 public class PipelineMessage {
     @Getter
     private final Type messageType;
@@ -45,6 +48,9 @@ public class PipelineMessage {
         return new PipelineMessage(Type.TIMER);
     }
 
+    /**
+     * TODO doc.
+     */
     public enum Type {
         TIMER,
         USERSPACE

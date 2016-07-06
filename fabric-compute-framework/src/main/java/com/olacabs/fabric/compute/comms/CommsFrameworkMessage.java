@@ -21,6 +21,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ *
+ *TODO javadoc.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -30,7 +34,8 @@ public class CommsFrameworkMessage<T> {
     private String source;
     private T payload;
 
-    public static <T> void translate(CommsFrameworkMessage<T> message, long sequence, CommsFrameworkMessage<T> original) {
+    public static <T> void translate(CommsFrameworkMessage<T> message, long sequence,
+            CommsFrameworkMessage<T> original) {
         message.setId(original.getId());
         message.setSource(original.getSource());
         message.setPayload(original.getPayload());

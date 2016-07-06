@@ -37,7 +37,7 @@ import java.util.Set;
  *TODO Add more.
  */
 public class NotificationBus {
-    private static final Logger logger = LoggerFactory.getLogger(NotificationBus.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NotificationBus.class);
     private final Map<Long, SimpleBitSet> tracker = Maps.newConcurrentMap();
     private Properties properties;
     private Map<Integer, Connection> connections = Maps.newHashMap();
@@ -46,7 +46,7 @@ public class NotificationBus {
 
     public NotificationBus(final Properties properties) {
         this.properties = properties;
-        logger.info("Notification bus created...");
+        LOGGER.info("Notification bus created...");
     }
 
     public NotificationBus source(PipelineStreamSource streamSource) {
@@ -71,18 +71,18 @@ public class NotificationBus {
         return this;
     }
 
-    synchronized public void publish(PipelineMessage message, int from) {
+    public synchronized void publish(PipelineMessage message, int from) {
         publish(message, from, true);
     }
 
-    synchronized public void publish(PipelineMessage message, int from, boolean forward) {
+    public synchronized void publish(PipelineMessage message, int from, boolean forward) {
         switch (message.getMessageType()) {
-            case TIMER: {
+            case TIMER:
                 // It is a timer message, ACKing is disabled
                 comms.get(from).commsChannel.publish(message);
                 break;
-            }
-            case USERSPACE: {
+
+            case USERSPACE:
                 // It is a userspace message, ACKing is enabled
                 PipelineMessage actionableMessage = message;
                 ImmutableSet.Builder<EventSet> ackCandidatesBuilder = ImmutableSet.builder();
@@ -111,7 +111,7 @@ public class NotificationBus {
                             connections.get(from).pipelineStages.stream().forEach(msgBitSet::set);
                         }
                     } catch (Exception e) {
-                        logger.error("Error setting tracking bits for generator: {}", from, e);
+                        LOGGER.error("Error setting tracking bits for generator: {}", from, e);
                     }
 
                     // unset the bit corresponding to the sender
@@ -125,13 +125,11 @@ public class NotificationBus {
                 try {
                     // publish the message to each of the receivers
                     if (forward && connections.containsKey(from)) {
-                        connections.get(from)
-                            .pipelineStages
-                            .stream()
-                            .forEach(pipeLineStage -> comms.get(pipeLineStage).commsChannel.publish(message));
+                        connections.get(from).pipelineStages.stream()
+                                .forEach(pipeLineStage -> comms.get(pipeLineStage).commsChannel.publish(message));
                     }
                 } catch (Throwable t) {
-                    logger.error("Error sending event to children for {}", from, t);
+                    LOGGER.error("Error sending event to children for {}", from, t);
                 }
                 // event sets which are eligible for ACKing
                 ImmutableSet<EventSet> ackSet = ackCandidatesBuilder.build();
@@ -145,8 +143,10 @@ public class NotificationBus {
                 }
 
                 break;
-            }
+            default: break;
+
         }
+
 
     }
 
@@ -162,7 +162,7 @@ public class NotificationBus {
     private static class Connection {
         private final Set<Integer> pipelineStages;
 
-        public Connection() {
+        Connection() {
             pipelineStages = Sets.newHashSet();
         }
 
@@ -172,6 +172,10 @@ public class NotificationBus {
         }
     }
 
+
+    /**
+     * TODO javadoc.
+     */
     @Builder
     public static class Communicator {
         private MessageSource pipelineStage;

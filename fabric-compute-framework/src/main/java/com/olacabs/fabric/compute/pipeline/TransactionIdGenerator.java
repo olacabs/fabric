@@ -16,6 +16,9 @@
 
 package com.olacabs.fabric.compute.pipeline;
 
+/**
+ * TODO javadoc.
+ */
 public interface TransactionIdGenerator {
     void seed(long seed);
 

@@ -19,6 +19,9 @@ package com.olacabs.fabric.compute.tracking;
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * Doc.
+ */
 public class SimpleBitSetTest {
     private int numBits = 256;
     private SimpleBitSet bitSet = new SimpleBitSet(numBits);
@@ -45,3 +48,4 @@ public class SimpleBitSetTest {
     }
 
 }
+

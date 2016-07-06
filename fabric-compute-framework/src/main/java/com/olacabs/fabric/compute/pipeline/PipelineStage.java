@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Metrics
 public class PipelineStage implements CommsMessageHandler<PipelineMessage>, MessageSource {
-    private static final Logger logger = LoggerFactory.getLogger(PipelineStage.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PipelineStage.class);
 
     @Getter
     private final String instanceId;
@@ -128,15 +128,16 @@ public class PipelineStage implements CommsMessageHandler<PipelineMessage>, Mess
     @Override
     public void handlePipelineMessage(PipelineMessage pipelineMessage) throws Exception {
         switch (pipelineMessage.getMessageType()) {
-            case TIMER: {
+            case TIMER:
                 //Todo::Use raw event Bundle instead
                 handleTimerMessage(pipelineMessage);
                 break;
-            }
-            case USERSPACE: {
+
+            case USERSPACE:
                 handleUserMessage(pipelineMessage);
                 break;
-            }
+            default: break;
+
         }
     }
 
@@ -155,20 +156,20 @@ public class PipelineStage implements CommsMessageHandler<PipelineMessage>, Mess
                             .messages(eventSet)
                             .build(),
                         id);
-                    logger.debug("[{}][{}] Scheduled processing completed.", processorMetadata.getName(),
+                    LOGGER.debug("[{}][{}] Scheduled processing completed.", processorMetadata.getName(),
                         processor.getId());
                     return null;
                 } catch (Throwable t) {
-                    logger.error("<timeTriggerHandler()> called on [{}][{}] threw exception: ", processor.getId(), t);
+                    LOGGER.error("<timeTriggerHandler()> called on [{}][{}] threw exception: ", processor.getId(), t);
                     throw t;
                 }
             });
         } catch (Exception e) {
             if (e.getCause() != null) {
-                logger.error("[{}][{}] error executing timeTriggerHandler()", processorMetadata.getName(),
+                LOGGER.error("[{}][{}] error executing timeTriggerHandler()", processorMetadata.getName(),
                     processor.getId(), e.getCause());
             } else {
-                logger.error("[{}][{}] error executing timeTriggerHandler()", processorMetadata.getName(),
+                LOGGER.error("[{}][{}] error executing timeTriggerHandler()", processorMetadata.getName(),
                     processor.getId(), e);
             }
         }
@@ -183,11 +184,11 @@ public class PipelineStage implements CommsMessageHandler<PipelineMessage>, Mess
                 try {
                     processor.process(context, eventCollector, pipelineMessage.getMessages());
                 } catch (Throwable t) {
-                    logger.error("<consume()> called on [{}][{}] threw exception: ", processorMetadata.getName(),
+                    LOGGER.error("<consume()> called on [{}][{}] threw exception: ", processorMetadata.getName(),
                         processor.getId(), t);
                     throw t;
                 }
-                logger.debug("[{}][{}][{}] Processing completed for message.", processorMetadata.getName(),
+                LOGGER.debug("[{}][{}][{}] Processing completed for message.", processorMetadata.getName(),
                     processor.getId(), pipelineMessage.getMessages().getId());
                 if (null != eventCollector.getEvents()) {
                     if (pipelineMessage.getMessages().getId() != eventCollector.getEvents().getId()) {
@@ -203,17 +204,19 @@ public class PipelineStage implements CommsMessageHandler<PipelineMessage>, Mess
             });
             if (null != generatedMessage) {
                 messageToSend = generatedMessage;
-                logger.debug("[{}][{}] Setting message to newly generated message: {}",
+                LOGGER.debug("[{}][{}] Setting message to newly generated message: {}",
                     processorMetadata.getName(), pipelineMessage.getMessages().getId(),
                     generatedMessage.getMessages().getId());
             }
         } catch (Exception e) {
             if (e.getCause() != null) {
-                logger.error(String.format("[%s][%s][%d] error executing handleUserMessage()",
-                    processorMetadata.getName(), processor.getId(), pipelineMessage.getMessages().getId()), e.getCause());
+                LOGGER.error(
+                        String.format("[%s][%s][%d] error executing handleUserMessage()", processorMetadata.getName(),
+                                processor.getId(), pipelineMessage.getMessages().getId()), e.getCause());
             } else {
-                logger.error(String.format("[%s][%s][%d] error executing handleUserMessage()",
-                    processorMetadata.getName(), processor.getId(), pipelineMessage.getMessages().getId()), e);
+                LOGGER.error(
+                        String.format("[%s][%s][%d] error executing handleUserMessage()", processorMetadata.getName(),
+                                processor.getId(), pipelineMessage.getMessages().getId()), e);
             }
         } finally {
             notificationBus.publish(messageToSend, id, !processor.isScheduled());

@@ -24,6 +24,9 @@ import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Test.
+ */
 public class ComponentPropertyReaderTest {
 
     @Test
@@ -108,3 +111,4 @@ public class ComponentPropertyReaderTest {
         assertEquals(true, connStr);
     }
 }
+

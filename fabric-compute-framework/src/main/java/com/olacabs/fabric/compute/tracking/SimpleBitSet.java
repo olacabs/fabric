@@ -18,11 +18,14 @@ package com.olacabs.fabric.compute.tracking;
 
 import java.util.Arrays;
 
+/**
+ * TODO doc.
+ */
 public class SimpleBitSet {
     private static final int NUM_BITS_IN_WORD = Long.BYTES * 8;
     private final int nBits;
     private int numWords;
-    private long words[];
+    private long[] words;
 
     public SimpleBitSet(int nBits) {
         assert (nBits > 0);
@@ -58,7 +61,9 @@ public class SimpleBitSet {
         boolean anyBitsSet = false;
         for (int i = 0; i < numWords; i++) {
             anyBitsSet = anyBitsSet || (words[i] != 0);
-            if (anyBitsSet) break;
+            if (anyBitsSet) {
+                break;
+            }
         }
         return anyBitsSet;
     }
