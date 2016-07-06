@@ -19,6 +19,9 @@ package com.olacabs.fabric.model.common;
 import com.olacabs.fabric.model.common.sources.ArtifactoryComponentSource;
 import com.olacabs.fabric.model.common.sources.JarComponentSource;
 
+/**
+ * TODO add more.
+ */
 public interface ComponentSourceVisitor {
     void visit(ArtifactoryComponentSource artifactoryComponentSource);
 

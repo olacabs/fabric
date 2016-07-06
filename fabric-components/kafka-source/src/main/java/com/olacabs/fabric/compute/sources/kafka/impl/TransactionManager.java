@@ -32,8 +32,11 @@ import java.util.List;
 import java.util.Queue;
 import java.util.stream.Collectors;
 
+/**
+ * TODO java doc.
+ */
 public class TransactionManager {
-    private static final Logger logger = LoggerFactory.getLogger(TransactionManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TransactionManager.class);
 
     private String topologyName;
     private String topic;
@@ -44,7 +47,8 @@ public class TransactionManager {
     private long lastTransactionId = 0L;
 
     @Builder
-    public TransactionManager(String topologyName, String topic, int partition, ObjectMapper mapper, CuratorFramework curator) {
+    public TransactionManager(String topologyName, String topic, int partition, ObjectMapper mapper,
+            CuratorFramework curator) {
         this.topologyName = topologyName;
         this.topic = topic;
         this.partition = partition;
@@ -65,15 +69,15 @@ public class TransactionManager {
             curator.delete().forPath(txnPath(transactionId));
         } catch (KeeperException.NoNodeException e) {
             //This error might happen as, the control might have gone to some other node
-            logger.warn("No node exists for [{}:{}} txn {}. Probably acked by another instance.",
-                topic, partition, transactionId);
+            LOGGER.warn("No node exists for [{}:{}} txn {}. Probably acked by another instance.", topic, partition,
+                    transactionId);
         }
         if (!existingEvents.isEmpty()) {
             if (existingEvents.peek().getTransactionId() == transactionId) {
                 existingEvents.remove();
             } else {
-                logger.warn("[{}:{}] Received ack for a non-existing transaction even though there are existing events!" +
-                    " Ordering might have been screwed!", topic, partition);
+                LOGGER.warn("[{}:{}] Received ack for a non-existing transaction even though there are existing events!"
+                        + " Ordering might have been screwed!", topic, partition);
             }
         }
     }
@@ -91,29 +95,30 @@ public class TransactionManager {
 
     public void readPendingTransactions() throws Exception {
         lastTransactionId = readLastTransactionId();
-        logger.info("[{}:{}] Last transaction id set to: {}", topic, partition, lastTransactionId);
+        LOGGER.info("[{}:{}] Last transaction id set to: {}", topic, partition, lastTransactionId);
         List<EventSetMeta> eventSetMetas = readExistingTransactions();
         if (eventSetMetas.isEmpty()) {
-            logger.info("No pending transactions on partition [{}:{}]", topic, partition);
+            LOGGER.info("No pending transactions on partition [{}:{}]", topic, partition);
         } else {
             existingEvents.addAll(eventSetMetas);
-            logger.info("Queued up {} pending transactions for [{}:{}]", eventSetMetas.size(), topic, partition);
+            LOGGER.info("Queued up {} pending transactions for [{}:{}]", eventSetMetas.size(), topic, partition);
         }
     }
 
     public void initialize() throws Exception {
         try {
             if (null == curator.checkExists().forPath(txnIdPath())) {
-                curator.create().creatingParentContainersIfNeeded().forPath(txnIdPath(), ByteBuffer.allocate(Long.BYTES).putLong(0L).array());
+                curator.create().creatingParentContainersIfNeeded()
+                        .forPath(txnIdPath(), ByteBuffer.allocate(Long.BYTES).putLong(0L).array());
                 lastTransactionId = 0L;
             }
         } catch (KeeperException.NodeExistsException e) {
-            logger.info("Txn ID path exists: " + path());
+            LOGGER.info("Txn ID path exists: " + path());
         }
         try {
             curator.create().creatingParentContainersIfNeeded().forPath(path());
         } catch (KeeperException.NodeExistsException e) {
-            logger.info("Txn path exists: " + path());
+            LOGGER.info("Txn path exists: " + path());
         }
 
     }
@@ -123,7 +128,7 @@ public class TransactionManager {
     }
 
     private long readLastTransactionId() throws Exception {
-        byte data[] = curator.getData().forPath(txnIdPath());
+        byte[] data = curator.getData().forPath(txnIdPath());
         ByteBuffer read = ByteBuffer.allocate(Long.BYTES).put(data, 0, data.length);
         read.flip();
         return read.getLong();

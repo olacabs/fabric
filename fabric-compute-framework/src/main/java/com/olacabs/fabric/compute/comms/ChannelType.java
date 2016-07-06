@@ -16,6 +16,9 @@
 
 package com.olacabs.fabric.compute.comms;
 
+/**
+ * TODO Add more.
+ */
 public enum ChannelType {
     BLOCKING_QUEUE,
     DISRUPTOR

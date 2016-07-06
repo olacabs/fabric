@@ -22,7 +22,14 @@ import kafka.producer.ProducerConfig;
 
 import java.util.Properties;
 
-public class MessageGenerator {
+/**
+ * TODO java doc.
+ */
+public final class MessageGenerator {
+
+    private MessageGenerator() {
+
+    }
 
     public static void main(String[] args) throws Exception {
         Properties props = new Properties();

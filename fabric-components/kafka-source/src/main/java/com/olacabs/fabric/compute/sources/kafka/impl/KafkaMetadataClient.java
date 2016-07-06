@@ -16,7 +16,12 @@
 
 package com.olacabs.fabric.compute.sources.kafka.impl;
 
-import com.github.rholder.retry.*;
+import com.github.rholder.retry.BlockStrategies;
+import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.Retryer;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -37,53 +42,51 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public class KafkaMetadataClient {
-    private final static Logger logger = LoggerFactory.getLogger(KafkaMetadataClient.class);
+/**
+ * TODO add more.
+ */
+public final class KafkaMetadataClient {
+
+    private KafkaMetadataClient() {
+
+    }
+    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaMetadataClient.class);
     private static final int BUFFER_SIZE = 1_048_576; //1MB
 
     public static List<HostPort> parseBrokerString(final String brokers) {
         ImmutableList.Builder<HostPort> listBuilder = ImmutableList.builder();
         for (String hostport : brokers.split(",")) {
-            final String components[] = hostport.split(":");
-            HostPort hostPort = HostPort.builder()
-                .host(components[0])
-                .port(Integer.parseInt(components[1]))
-                .build();
+            final String[] components = hostport.split(":");
+            HostPort hostPort = HostPort.builder().host(components[0]).port(Integer.parseInt(components[1])).build();
             listBuilder.add(hostPort);
         }
         return listBuilder.build();
     }
 
-    public static Map<Integer, HostPort> findLeadersForPartitions(final String brokers, final String topic) throws BrokerQueryException {
+    public static Map<Integer, HostPort> findLeadersForPartitions(final String brokers, final String topic)
+            throws BrokerQueryException {
 
         ImmutableMap.Builder<Integer, HostPort> leadersBuilder = ImmutableMap.builder();
         Retryer<Map<Integer, HostPort>> simpleConsumerRetryer = RetryerBuilder.<Map<Integer, HostPort>>newBuilder()
-            .retryIfResult(Predicates.<Map<Integer, HostPort>>isNull())
-            .retryIfException()
-            .retryIfRuntimeException()
-            .withStopStrategy(StopStrategies.neverStop())
-            .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
-            .withBlockStrategy(BlockStrategies.threadSleepStrategy())
-            .build();
+                .retryIfResult(Predicates.<Map<Integer, HostPort>>isNull()).retryIfException().retryIfRuntimeException()
+                .withStopStrategy(StopStrategies.neverStop())
+                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+                .withBlockStrategy(BlockStrategies.threadSleepStrategy()).build();
         final List<HostPort> brokerList = parseBrokerString(brokers);
         try {
             return simpleConsumerRetryer.call(() -> {
                 for (HostPort currentHostPort : brokerList) {
                     SimpleConsumer simpleConsumer = null;
                     try {
-                        simpleConsumer = new SimpleConsumer(currentHostPort.getHost(), currentHostPort.getPort(),
-                            1000, BUFFER_SIZE,
-                            HostUtils.hostname());
+                        simpleConsumer = new SimpleConsumer(currentHostPort.getHost(), currentHostPort.getPort(), 1000,
+                                BUFFER_SIZE, HostUtils.hostname());
                         TopicMetadataRequest request = new TopicMetadataRequest(Collections.singletonList(topic));
                         TopicMetadataResponse response = simpleConsumer.send(request);
                         for (TopicMetadata metadata : response.topicsMetadata()) {
-                            metadata.partitionsMetadata().forEach(partitionMetadata ->
-                                leadersBuilder.put(
-                                    partitionMetadata.partitionId(),
-                                    HostPort.builder()
-                                        .host(partitionMetadata.leader().host())
-                                        .port(partitionMetadata.leader().port())
-                                        .build()));
+                            metadata.partitionsMetadata().forEach(partitionMetadata -> leadersBuilder
+                                    .put(partitionMetadata.partitionId(),
+                                            HostPort.builder().host(partitionMetadata.leader().host())
+                                                    .port(partitionMetadata.leader().port()).build()));
                         }
                         return leadersBuilder.build();
                     } finally {
@@ -95,10 +98,10 @@ public class KafkaMetadataClient {
                 return Collections.emptyMap();
             });
         } catch (ExecutionException e) {
-            logger.error("Error getting leaders for partitions of " + topic, e);
+            LOGGER.error("Error getting leaders for partitions of " + topic, e);
         } catch (RetryException e) {
-            logger.error("Retry error getting leaders for partitions of " + topic, e);
-            logger.error("ATTEMPT EXCEPTION: ", e.getLastFailedAttempt().getExceptionCause());
+            LOGGER.error("Retry error getting leaders for partitions of " + topic, e);
+            LOGGER.error("ATTEMPT EXCEPTION: ", e.getLastFailedAttempt().getExceptionCause());
             //System.exit(-1);
             throw new BrokerQueryException("Error finding broker:", e.getLastFailedAttempt().getExceptionCause());
         }
@@ -109,15 +112,19 @@ public class KafkaMetadataClient {
         TopicAndPartition topicAndPartition = new TopicAndPartition(topic, partition);
         Map<TopicAndPartition, PartitionOffsetRequestInfo> requestInfo = Maps.newHashMap();
         if (strategy.equalsIgnoreCase(StartOffsetPickStrategy.EARLIEST.toString())) {
-            requestInfo.put(topicAndPartition, new PartitionOffsetRequestInfo(kafka.api.OffsetRequest.EarliestTime(), 1));
+            requestInfo
+                    .put(topicAndPartition, new PartitionOffsetRequestInfo(kafka.api.OffsetRequest.EarliestTime(), 1));
         } else {
             requestInfo.put(topicAndPartition, new PartitionOffsetRequestInfo(kafka.api.OffsetRequest.LatestTime(), 1));
         }
-        kafka.javaapi.OffsetRequest request = new kafka.javaapi.OffsetRequest(requestInfo, kafka.api.OffsetRequest.CurrentVersion(), HostUtils.hostname());
+        kafka.javaapi.OffsetRequest request =
+                new kafka.javaapi.OffsetRequest(requestInfo, kafka.api.OffsetRequest.CurrentVersion(),
+                        HostUtils.hostname());
         OffsetResponse response = consumer.getOffsetsBefore(request);
 
         if (response.hasError()) {
-            System.out.println("Error fetching data Offset Data the Broker. Reason: " + response.errorCode(topic, partition));
+            System.out.println(
+                    "Error fetching data Offset Data the Broker. Reason: " + response.errorCode(topic, partition));
             return 0;
         }
         long[] offsets = response.offsets(topic, partition);

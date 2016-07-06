@@ -23,6 +23,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * TODO Add more.
+ */
 @Builder
 @Data
 public class RawEventBundle {

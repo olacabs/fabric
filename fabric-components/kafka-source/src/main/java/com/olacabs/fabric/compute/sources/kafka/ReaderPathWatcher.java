@@ -25,8 +25,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 
+/**
+ * TODO add doc.
+ */
 public class ReaderPathWatcher implements PathChildrenCacheListener {
-    private static final Logger logger = LoggerFactory.getLogger(ReaderPathWatcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReaderPathWatcher.class);
 
     private final Collection<KafkaMessageReader> readers;
 
@@ -35,21 +38,22 @@ public class ReaderPathWatcher implements PathChildrenCacheListener {
     }
 
     @Override
-    public void childEvent(CuratorFramework curatorFramework, PathChildrenCacheEvent pathChildrenCacheEvent) throws Exception {
+    public void childEvent(CuratorFramework curatorFramework, PathChildrenCacheEvent pathChildrenCacheEvent)
+            throws Exception {
         switch (pathChildrenCacheEvent.getType()) {
-
             case CHILD_ADDED:
             case CHILD_UPDATED:
-            case CHILD_REMOVED: {
-                logger.info("Detected changes in children nodes: Will retrigger leadership");
+            case CHILD_REMOVED:
+                LOGGER.info("Detected changes in children nodes: Will retrigger leadership");
                 //readers.forEach(reader -> reader.getLeaderSelector().interruptLeadership());
                 break;
-            }
+
             case CONNECTION_SUSPENDED:
             case CONNECTION_RECONNECTED:
             case CONNECTION_LOST:
             case INITIALIZED:
                 break;
+            default:break;
         }
     }
 }

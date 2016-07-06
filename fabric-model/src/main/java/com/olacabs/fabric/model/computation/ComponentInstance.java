@@ -24,6 +24,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.Properties;
 
+/**
+ * TODO Add more.
+ */
 @Data
 @Builder
 @AllArgsConstructor

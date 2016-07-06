@@ -25,7 +25,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class EventSet {
+/**
+ * TODO Add more.
+ */
+public final class EventSet {
     @Getter
     private final int sourceId;
     @Getter
@@ -52,7 +55,8 @@ public class EventSet {
     private boolean isAggregate;
 
     @Builder(builderMethodName = "eventFromSourceBuilder", builderClassName = "EventFromSourceBuilder")
-    private EventSet(long id, int sourceId, int partitionId, @Singular List<Event> events, long transactionId, @Singular("meta") Map<String, Object> meta) {
+    private EventSet(long id, int sourceId, int partitionId, @Singular List<Event> events, long transactionId,
+            @Singular("meta") Map<String, Object> meta) {
         this.id = id;
         this.sourceId = sourceId;
         this.partitionId = partitionId;
