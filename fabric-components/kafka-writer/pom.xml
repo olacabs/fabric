@@ -43,13 +43,13 @@
         <dependency>
             <groupId>com.olacabs.fabric</groupId>
             <artifactId>fabric-compute-framework</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.olacabs.fabric</groupId>
             <artifactId>fabric-compute-framework</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
 
