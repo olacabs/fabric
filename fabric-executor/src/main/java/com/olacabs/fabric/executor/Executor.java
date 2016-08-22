@@ -159,10 +159,9 @@ public class Executor {
             LOGGER.warn("No metrics data available");
         }
 
+        MetricRegistry registry = SharedMetricRegistries.getOrCreate("metrics-registry");
         MetadataSource metadataSource = metadataSource(commandLine);
-
         ComputationSpec spec = metadataSource.load(specPath(commandLine));
-
         DownloadingLoader loader = new DownloadingLoader();
         ImmutableSet.Builder<ComponentSource> componentSourceSetBuilder = ImmutableSet.builder();
         spec.getSources().forEach(sourceMeta -> componentSourceSetBuilder.add(sourceMeta.getMeta().getSource()));
@@ -172,7 +171,6 @@ public class Executor {
         LOGGER.info("Component Jar URLs: {}", resolvedUrls);
 
         loader.loadJars(resolvedUrls, Thread.currentThread().getContextClassLoader());
-        MetricRegistry registry = SharedMetricRegistries.getOrCreate("metrics-registry");
 
         Linker linker = new Linker(loader, registry);
 
