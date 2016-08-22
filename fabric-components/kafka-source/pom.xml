@@ -25,28 +25,27 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>kafka-source</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <guava-retrying.version>2.0.0</guava-retrying.version>
+        <curator-framework.version>2.9.0</curator-framework.version>
+        <curator-recipes.version>2.9.0</curator-recipes.version>
+        <kafka.version>0.8.2.2</kafka.version>
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.16.6</version>
-            <scope>provided</scope>
-        </dependency>
+
         <dependency>
             <groupId>com.github.rholder</groupId>
             <artifactId>guava-retrying</artifactId>
-            <version>2.0.0</version>
+            <version>${guava-retrying.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.apache.curator</groupId>
             <artifactId>curator-framework</artifactId>
-            <version>2.9.0</version>
+            <version>${curator-framework.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -58,10 +57,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <dependency>
             <groupId>org.apache.curator</groupId>
             <artifactId>curator-recipes</artifactId>
-            <version>2.9.0</version>
+            <version>${curator-recipes.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -73,10 +73,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka_2.10</artifactId>
-            <version>0.8.2.2</version>
+            <version>${kafka.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -88,12 +89,14 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <dependency>
             <groupId>com.olacabs.fabric</groupId>
             <artifactId>fabric-compute-framework</artifactId>
             <version>${project.parent.version}</version>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>com.olacabs.fabric</groupId>
             <artifactId>fabric-compute-framework</artifactId>
@@ -101,12 +104,7 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
-        </dependency>
+
     </dependencies>
 
     <build>
