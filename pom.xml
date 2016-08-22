@@ -22,6 +22,48 @@
     <artifactId>fabric-compute</artifactId>
     <packaging>pom</packaging>
     <version>1.0.0-SNAPSHOT</version>
+    <description>Fabric Stream compute</description>
+    <name>Apache Fabric</name>
+
+    <parent>
+        <groupId>org.apache</groupId>
+        <artifactId>apache</artifactId>
+        <version>17</version>
+    </parent>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <organization>
+        <name>Apache Software Foundation</name>
+        <url>http://www.apache.org</url>
+    </organization>
+    <inceptionYear>2016</inceptionYear>
+
+    <mailingLists>
+        <mailingList>
+            <name>fabric-user</name>
+            <!-- TODO update the below details accordingly -->
+            <subscribe>user-subscribe@fabric.apache.org</subscribe>
+            <unsubscribe>user-unsubscribe@fabric.apache.org</unsubscribe>
+            <post>user@fabric.apache.org</post>
+            <archive>http://mail-archives.apache.org/mod_mbox/fabric-user/</archive>
+        </mailingList>
+    </mailingLists>
+
+    <scm>
+        <!-- TODO Update the SCM to open-source github-->
+        <connection>scm:git:ssh://git@gitlab.corp.olacabs.com:2222/dataplatform/fabric.git</connection>
+        <url>scm:git:ssh://git@gitlab.corp.olacabs.com:2222/dataplatform/fabric.git</url>
+        <developerConnection>scm:git:https://gitlab.corp.olacabs.com/dataplatform/fabric.git
+        </developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
     <modules>
         <module>fabric-common</module>
         <module>fabric-model</module>
