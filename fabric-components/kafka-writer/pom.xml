@@ -23,12 +23,9 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.olacabs.fabric</groupId>
     <artifactId>kafka-writer</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -40,31 +37,20 @@
     </properties>
 
     <dependencies>
+
         <dependency>
             <groupId>com.olacabs.fabric</groupId>
             <artifactId>fabric-compute-framework</artifactId>
             <version>${project.parent.version}</version>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>com.olacabs.fabric</groupId>
             <artifactId>fabric-compute-framework</artifactId>
             <version>${project.parent.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
-
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>

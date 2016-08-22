@@ -26,6 +26,19 @@
 
     <artifactId>fabric-compute-framework</artifactId>
 
+    <properties>
+        <guava-retrying.version>2.0.0</guava-retrying.version>
+        <metrics-core.version>3.1.2</metrics-core.version>
+        <metrics-aspectj.version>1.0.0</metrics-aspectj.version>
+        <aspectjrt.version>1.8.2</aspectjrt.version>
+        <javax.el.version>3.0.0</javax.el.version>
+        <httpclient.version>4.5</httpclient.version>
+        <reflections.version>0.9.9-RC2</reflections.version>
+        <jfrog.version>0.16</jfrog.version>
+        <jackson-dataformat.version>2.5.1</jackson-dataformat.version>
+        <disruptor.version>3.3.4</disruptor.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <artifactId>fabric-common</artifactId>
@@ -56,47 +69,55 @@
         <dependency>
             <groupId>com.github.rholder</groupId>
             <artifactId>guava-retrying</artifactId>
-            <version>2.0.0</version>
+            <version>${guava-retrying.version}</version>
         </dependency>
+
         <dependency>
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-logging</artifactId>
             <version>${dropwizard.version}</version>
         </dependency>
+
         <dependency>
             <groupId>io.dropwizard.metrics</groupId>
             <artifactId>metrics-core</artifactId>
-            <version>3.1.2</version>
+            <version>${metrics-core.version}</version>
         </dependency>
+
         <dependency>
             <groupId>io.astefanutti.metrics.aspectj</groupId>
             <artifactId>metrics-aspectj</artifactId>
-            <version>1.0.0</version>
+            <version>${metrics-aspectj.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
-            <version>1.8.2</version>
+            <version>${aspectjrt.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>javax.el</artifactId>
-            <version>3.0.0</version>
+            <version>${javax.el.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.5</version>
+            <version>${httpclient.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.reflections</groupId>
             <artifactId>reflections-maven</artifactId>
-            <version>0.9.9-RC2</version>
+            <version>${reflections.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.jfrog.artifactory.client</groupId>
             <artifactId>artifactory-java-client-services</artifactId>
-            <version>0.16</version>
+            <version>${jfrog.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.fasterxml.jackson.core</groupId>
@@ -112,15 +133,17 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-xml</artifactId>
-            <version>2.5.1</version>
+            <version>${jackson-dataformat.version}</version>
         </dependency>
+
         <dependency>
             <groupId>com.lmax</groupId>
             <artifactId>disruptor</artifactId>
-            <version>3.3.4</version>
+            <version>${disruptor.version}</version>
         </dependency>
 
     </dependencies>

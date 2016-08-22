@@ -26,27 +26,38 @@
 
     <artifactId>fabric-model</artifactId>
 
+    <properties>
+        <jackson-annotations.version>2.5.1</jackson-annotations.version>
+        <validation.version>1.0.0.GA</validation.version>
+        <hibernate-validator.version>5.2.3.Final</hibernate-validator.version>
+    </properties>
+
     <dependencies>
+
         <dependency>
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-jackson</artifactId>
-            <version>0.8.4</version>
+            <version>${dropwizard.version}</version>
         </dependency>
+
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>2.5.1</version>
+            <version>${jackson-annotations.version}</version>
         </dependency>
+
         <dependency>
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
-            <version>1.0.0.GA</version>
+            <version>${validation.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>5.2.3.Final</version>
+            <version>${hibernate-validator.version}</version>
         </dependency>
+
     </dependencies>
 
     <build>
