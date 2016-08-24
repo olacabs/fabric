@@ -16,11 +16,23 @@
 
 package com.olacabs.fabric.compute.builder.impl;
 
+import java.io.FileNotFoundException;
+import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * TODO javadoc.
  */
-public interface JarDownloader {
-    Path download(final String url);
+public class FileJarDownloader implements JarDownloader {
+
+    public Path download(final String url) {
+        URI uri = URI.create(url);
+        if (!Files.exists(Paths.get(uri))) {
+            throw new RuntimeException(new FileNotFoundException(Paths.get(uri).toAbsolutePath() + " does not exist"));
+        } else {
+            return Paths.get(URI.create(url));
+        }
+    }
 }

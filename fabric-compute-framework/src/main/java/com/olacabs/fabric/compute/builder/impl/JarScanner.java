@@ -26,6 +26,7 @@ import com.olacabs.fabric.model.processor.Processor;
 import com.olacabs.fabric.model.source.Source;
 import lombok.Builder;
 import lombok.Data;
+import org.apache.http.conn.UnsupportedSchemeException;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
@@ -33,7 +34,7 @@ import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
@@ -44,11 +45,13 @@ import java.util.stream.Collectors;
  */
 public class JarScanner {
     private static final Logger LOGGER = LoggerFactory.getLogger(DownloadingLoader.class);
+    private static final String PROPERTIES_FILE_NAME = "compute.properties";
 
-    private final HttpFileDownloader downloader;
+    private Properties properties;
 
-    public JarScanner(HttpFileDownloader downloader) {
-        this.downloader = downloader;
+    public JarScanner() throws Exception {
+        this.properties = new Properties();
+        this.properties.load(JarScanner.class.getResourceAsStream("/" + PROPERTIES_FILE_NAME));
     }
 
     private URL[] genUrls(URL[] jarFileURLs) {
@@ -72,17 +75,32 @@ public class JarScanner {
         ClassLoader child = createClassLoader(downloadedUrls);
         // Evil hack
         Thread.currentThread().setContextClassLoader(child);
-        return ImmutableList.<ScanResult>builder()
-            .addAll(scanForProcessors(child, downloadedUrls))
-            .addAll(scanForSources(child, downloadedUrls))
-            .build();
+        return ImmutableList.<ScanResult>builder().addAll(scanForProcessors(child, downloadedUrls))
+                .addAll(scanForSources(child, downloadedUrls)).build();
     }
 
-    private URL[] download(Collection<String> urls) {
+    URL[] download(Collection<String> urls) {
+
         ArrayList<URL> downloadedURLs = urls.stream().map(url -> {
+            URI uri = URI.create(url);
+            String downloaderImplClassName = properties.getProperty(String.format("fs.%s.impl", uri.getScheme()));
+            if (null == downloaderImplClassName) {
+                throw new RuntimeException(
+                        new UnsupportedSchemeException(uri.getScheme() + " is not supported for downloading jars"));
+            }
             try {
-                return downloader.download(url).toUri().toURL();
-            } catch (MalformedURLException e) {
+                Class clazz = Class.forName(downloaderImplClassName);
+                if (JarDownloader.class.isAssignableFrom(clazz)) {
+                    try {
+                        return ((JarDownloader) clazz.newInstance()).download(url).toUri().toURL();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                } else {
+                    throw new RuntimeException("Unsupported implementation " + downloaderImplClassName
+                            + " of " + JarDownloader.class.getSimpleName());
+                }
+            } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
         })  .collect(Collectors.toCollection(ArrayList::new));
@@ -90,60 +108,40 @@ public class JarScanner {
     }
 
     private List<ScanResult> scanForProcessors(ClassLoader classLoader, URL[] downloadedUrls) throws Exception {
-        Reflections reflections = new Reflections(new ConfigurationBuilder()
-            .addClassLoader(classLoader)
-            .addScanners(new SubTypesScanner(), new TypeAnnotationsScanner())
-            .addUrls(downloadedUrls));
+        Reflections reflections = new Reflections(new ConfigurationBuilder().addClassLoader(classLoader)
+                .addScanners(new SubTypesScanner(), new TypeAnnotationsScanner()).addUrls(downloadedUrls));
         Set<Class<?>> processors = Sets.intersection(reflections.getTypesAnnotatedWith(Processor.class),
                 reflections.getSubTypesOf(ProcessorBase.class));
 
         return processors.stream().map(processor -> {
             Processor processorInfo = processor.getAnnotation(Processor.class);
-            ComponentMetadata metadata = ComponentMetadata.builder()
-                .type(ComponentType.PROCESSOR)
-                .namespace(processorInfo.namespace())
-                .name(processorInfo.name())
-                .version(processorInfo.version())
-                .description(processorInfo.description())
-                .cpu(processorInfo.cpu())
-                .memory(processorInfo.memory())
-                .processorType(processorInfo.processorType())
-                .requiredProperties(ImmutableList.copyOf(processorInfo.requiredProperties()))
-                .optionalProperties(ImmutableList.copyOf(processorInfo.optionalProperties()))
-                .build();
+            ComponentMetadata metadata =
+                    ComponentMetadata.builder().type(ComponentType.PROCESSOR).namespace(processorInfo.namespace())
+                            .name(processorInfo.name()).version(processorInfo.version())
+                            .description(processorInfo.description()).cpu(processorInfo.cpu())
+                            .memory(processorInfo.memory()).processorType(processorInfo.processorType())
+                            .requiredProperties(ImmutableList.copyOf(processorInfo.requiredProperties()))
+                            .optionalProperties(ImmutableList.copyOf(processorInfo.optionalProperties())).build();
 
-            return ScanResult.builder()
-                .metadata(metadata)
-                .componentClass(processor)
-                .build();
+            return ScanResult.builder().metadata(metadata).componentClass(processor).build();
         }).collect(Collectors.toCollection(ArrayList::new));
     }
 
     private List<ScanResult> scanForSources(ClassLoader classLoader, URL[] downloadedUrls) throws Exception {
-        Reflections reflections = new Reflections(new ConfigurationBuilder()
-            .addClassLoader(classLoader)
-            .addScanners(new SubTypesScanner(), new TypeAnnotationsScanner())
-            .addUrls(downloadedUrls));
+        Reflections reflections = new Reflections(new ConfigurationBuilder().addClassLoader(classLoader)
+                .addScanners(new SubTypesScanner(), new TypeAnnotationsScanner()).addUrls(downloadedUrls));
         Set<Class<?>> sources = Sets.intersection(reflections.getTypesAnnotatedWith(Source.class),
                 reflections.getSubTypesOf(PipelineSource.class));
         return sources.stream().map(source -> {
             Source sourceInfo = source.getAnnotation(Source.class);
-            ComponentMetadata metadata = ComponentMetadata.builder()
-                .type(ComponentType.SOURCE)
-                .namespace(sourceInfo.namespace())
-                .name(sourceInfo.name())
-                .version(sourceInfo.version())
-                .description(sourceInfo.description())
-                .cpu(sourceInfo.cpu())
-                .memory(sourceInfo.memory())
-                .requiredProperties(ImmutableList.copyOf(sourceInfo.requiredProperties()))
-                .optionalProperties(ImmutableList.copyOf(sourceInfo.optionalProperties()))
-                .build();
+            ComponentMetadata metadata =
+                    ComponentMetadata.builder().type(ComponentType.SOURCE).namespace(sourceInfo.namespace())
+                            .name(sourceInfo.name()).version(sourceInfo.version()).description(sourceInfo.description())
+                            .cpu(sourceInfo.cpu()).memory(sourceInfo.memory())
+                            .requiredProperties(ImmutableList.copyOf(sourceInfo.requiredProperties()))
+                            .optionalProperties(ImmutableList.copyOf(sourceInfo.optionalProperties())).build();
 
-            return ScanResult.builder()
-                .metadata(metadata)
-                .componentClass(source)
-                .build();
+            return ScanResult.builder().metadata(metadata).componentClass(source).build();
 
         }).collect(Collectors.toCollection(ArrayList::new));
     }
@@ -151,9 +149,7 @@ public class JarScanner {
     /**
      * Scan result class.
      */
-    @Builder
-    @Data
-    public static class ScanResult {
+    @Builder @Data public static class ScanResult {
         private ComponentMetadata metadata;
         private Class<?> componentClass;
     }

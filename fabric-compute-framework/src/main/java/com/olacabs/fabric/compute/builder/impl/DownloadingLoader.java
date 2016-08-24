@@ -39,13 +39,9 @@ public class DownloadingLoader implements Loader {
     private JarScanner jarScanner;
 
     public DownloadingLoader() throws Exception {
-        this(null);
+        this.jarScanner = new JarScanner();
     }
 
-    public DownloadingLoader(final String namePrefix) throws Exception {
-        HttpFileDownloader downloader = new HttpFileDownloader(namePrefix);
-        this.jarScanner = new JarScanner(downloader);
-    }
 
     @Override
     public PipelineSource loadSource(ComponentMetadata source) {

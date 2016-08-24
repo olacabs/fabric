@@ -43,17 +43,17 @@ import java.util.Set;
 /**
  * TODO javadoc.
  */
-public class HttpFileDownloader {
-    private static final Logger LOGGER = LoggerFactory.getLogger(HttpFileDownloader.class);
+public class HttpJarDownloader implements JarDownloader{
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpJarDownloader.class);
 
     private final String tmpDirectory;
     private final CloseableHttpClient httpClient;
 
 
-    public HttpFileDownloader(final String namePrefix) throws Exception {
+    public HttpJarDownloader() throws Exception {
         FileAttribute<Set<PosixFilePermission>> perms =
                 PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwxr-xr-x"));
-        Path createdPath = Files.createTempDirectory(namePrefix, perms);
+        Path createdPath = Files.createTempDirectory(null, perms);
         this.tmpDirectory = createdPath.toAbsolutePath().toString();
 
         PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
@@ -106,5 +106,4 @@ public class HttpFileDownloader {
             }
         }
     }
-
 }
