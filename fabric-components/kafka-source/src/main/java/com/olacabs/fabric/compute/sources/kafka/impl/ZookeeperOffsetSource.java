@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016 ANI Technologies Pvt. Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.olacabs.fabric.compute.sources.kafka.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -14,10 +30,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Zookeeper based offset manager
+ * Zookeeper based offset manager.
  */
 public class ZookeeperOffsetSource implements OffsetSource {
-    private static final Logger logger = LoggerFactory.getLogger(ZookeeperOffsetSource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZookeeperOffsetSource.class);
 
     private final String topologyName;
     private final String topicName;
@@ -27,7 +43,8 @@ public class ZookeeperOffsetSource implements OffsetSource {
     private final Set<String> ensuredPaths = Sets.newConcurrentHashSet();
 
     @Builder
-    public ZookeeperOffsetSource(String topologyName, String topicName, CuratorFramework curatorFramework, ObjectMapper objectMapper) {
+    public ZookeeperOffsetSource(String topologyName, String topicName, CuratorFramework curatorFramework,
+            ObjectMapper objectMapper) {
         this.topologyName = topologyName;
         this.topicName = topicName;
         this.curatorFramework = curatorFramework;
@@ -38,9 +55,9 @@ public class ZookeeperOffsetSource implements OffsetSource {
                 curatorFramework.create().creatingParentContainersIfNeeded().forPath(path);
             }
         } catch (KeeperException.NodeExistsException e) {
-            logger.info("{} already exists.", path);
+            LOGGER.info("{} already exists.", path);
         } catch (Exception e) {
-            logger.warn("Error creating path on ZK: {}", path, e);
+            LOGGER.warn("Error creating path on ZK: {}", path, e);
         }
     }
 
@@ -54,7 +71,7 @@ public class ZookeeperOffsetSource implements OffsetSource {
 
     @Override
     public void saveOffset(String topic, int partition, long offset) throws Exception {
-        //TODO::BATCH THIS
+        //TODO BATCH THIS
         final String path = partitionPath(topologyName, topicName, partition);
         if (!ensuredPaths.contains(path)) {
             if (null == curatorFramework.checkExists().forPath(path)) {
@@ -62,7 +79,8 @@ public class ZookeeperOffsetSource implements OffsetSource {
             }
         }
         ensuredPaths.add(path);
-        curatorFramework.setData().forPath(path, objectMapper.writeValueAsBytes(Collections.singletonMap("offset", offset)));
+        curatorFramework.setData()
+                .forPath(path, objectMapper.writeValueAsBytes(Collections.singletonMap("offset", offset)));
     }
 
     @Override

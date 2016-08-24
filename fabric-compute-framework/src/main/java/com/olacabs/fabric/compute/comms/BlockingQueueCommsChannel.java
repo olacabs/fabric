@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016 ANI Technologies Pvt. Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.olacabs.fabric.compute.comms;
 
 import lombok.extern.slf4j.Slf4j;
@@ -8,18 +24,19 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * Created by santanu.s on 10/09/15.
+ *
+ * TODO add javadoc.
  */
 @Slf4j
-public class BlockingQueueCommsChannel<EventType> implements CommsChannel<EventType> {
+public class BlockingQueueCommsChannel<E> implements CommsChannel<E> {
     private final String name;
     private final boolean isSingleProducer;
-    private final CommsMessageHandler<EventType> handler;
+    private final CommsMessageHandler<E> handler;
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private LinkedBlockingQueue<CommsFrameworkMessage<EventType>> queue;
+    private LinkedBlockingQueue<CommsFrameworkMessage<E>> queue;
     private Future jobFuture;
 
-    BlockingQueueCommsChannel(String name, boolean isSingleProducer, CommsMessageHandler<EventType> handler) {
+    BlockingQueueCommsChannel(String name, boolean isSingleProducer, CommsMessageHandler<E> handler) {
         this.isSingleProducer = isSingleProducer;
         this.handler = handler;
         this.name = name;
@@ -31,10 +48,10 @@ public class BlockingQueueCommsChannel<EventType> implements CommsChannel<EventT
     }
 
     @Override
-    public void publish(EventType sourceEvent) {
+    public void publish(E sourceEvent) {
         try {
             queue.put(
-                (CommsFrameworkMessage<EventType>) CommsFrameworkMessage.<EventType>builder()
+                (CommsFrameworkMessage<E>) CommsFrameworkMessage.<E>builder()
                     .id(0)
                     .payload(sourceEvent)
                     .source(name)
@@ -49,7 +66,7 @@ public class BlockingQueueCommsChannel<EventType> implements CommsChannel<EventT
         queue = new LinkedBlockingQueue<>(8);
         jobFuture = executorService.submit(() -> {
             while (true) {
-                CommsFrameworkMessage<EventType> message = queue.take();
+                CommsFrameworkMessage<E> message = queue.take();
                 try {
                     handler.handlePipelineMessage(message.getPayload());
                 } catch (Throwable t) {
@@ -61,7 +78,7 @@ public class BlockingQueueCommsChannel<EventType> implements CommsChannel<EventT
 
     @Override
     public void stop() {
-        if(null != jobFuture) {
+        if (null != jobFuture) {
             jobFuture.cancel(true);
         }
     }

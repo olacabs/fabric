@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016 ANI Technologies Pvt. Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.olacabs.fabric;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,15 +25,13 @@ import com.olacabs.fabric.compute.processor.ProcessingException;
 import com.olacabs.fabric.compute.processor.ScheduledProcessor;
 import com.olacabs.fabric.compute.util.ComponentPropertyReader;
 import com.olacabs.fabric.model.common.ComponentMetadata;
+import com.olacabs.fabric.model.event.Event;
 import com.olacabs.fabric.model.event.EventSet;
 import com.olacabs.fabric.model.processor.Processor;
 import com.olacabs.fabric.model.processor.ProcessorType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
-
-import com.olacabs.fabric.model.event.Event;
-import com.olacabs.fabric.common.Document;
 
 import java.io.IOException;
 import java.util.List;
@@ -31,10 +45,10 @@ import java.util.Properties;
 @Slf4j
 @Data
 @Processor(namespace = "global",
-        name = "${artifactId}", version = "0.0.1-SNAPSHOT", description = "Skeleton Timed Processor",
-        cpu = 0.1, memory = 512, processorType = ProcessorType.TIMER_DRIVEN,
-        requiredProperties = {"sampleSenderName", "sampleBool", "sampleInt"},
-        optionalProperties = {"sampleOptionalProp"}
+    name = "${artifactId}", version = "0.0.1-SNAPSHOT", description = "Skeleton Timed Processor",
+    cpu = 0.1, memory = 512, processorType = ProcessorType.TIMER_DRIVEN,
+    requiredProperties = {"sampleSenderName", "sampleBool", "sampleInt"},
+    optionalProperties = {"sampleOptionalProp"}
 )
 public class SampleScheduledProcessor extends ScheduledProcessor {
 

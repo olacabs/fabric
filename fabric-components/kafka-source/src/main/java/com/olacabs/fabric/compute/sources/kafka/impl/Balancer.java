@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016 ANI Technologies Pvt. Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.olacabs.fabric.compute.sources.kafka.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,11 +32,10 @@ import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * Created by santanu.s on 07/10/15.
+ * TODO Add more.
  */
-
 public class Balancer {
-    private static final Logger logger = LoggerFactory.getLogger(Balancer.class);
+    private static final Logger LOGGER  = LoggerFactory.getLogger(Balancer.class);
 
     private final String topologyName;
     private final String brokers;
@@ -37,7 +52,8 @@ public class Balancer {
 
     @Builder
     public Balancer(String instanceId, String topologyName, String brokers, String topic,
-                    CuratorFramework curatorFramework, ObjectMapper objectMapper, int bufferSize, String startOffsetPickStrategy) {
+            CuratorFramework curatorFramework, ObjectMapper objectMapper, int bufferSize,
+            String startOffsetPickStrategy) {
         this.topologyName = topologyName;
         this.brokers = brokers;
         this.topic = topic;
@@ -52,7 +68,7 @@ public class Balancer {
         if (leaders.isEmpty()) {
             throw new Exception("Could not find any leaders for any of the partitions in topic: " + topic);
         }
-        logger.info("Number of leaders: {}", leaders.size());
+        LOGGER.info("Number of leaders: {}", leaders.size());
         events = new LinkedBlockingQueue<>(leaders.size());
         KafkaConsumerBuilder consumerBuilder = KafkaConsumerBuilder.builder()
             .brokers(brokers)
@@ -83,7 +99,7 @@ public class Balancer {
                             .partition(entry.getKey())
                             .build())
                     .build());
-            logger.info("Created reader object for {}", topic);
+            LOGGER.info("Created reader object for {}", topic);
         });
         readers.values().forEach(kafkaMessageReader -> {
             try {
@@ -92,7 +108,8 @@ public class Balancer {
                 throw new RuntimeException(e);
             }
         });
-        KafkaReaderLeaderElector leaderElector = new KafkaReaderLeaderElector(topologyName, topic, readers, curatorFramework, objectMapper);
+        KafkaReaderLeaderElector leaderElector =
+                new KafkaReaderLeaderElector(topologyName, topic, readers, curatorFramework, objectMapper);
         leaderElector.start();
     }
 
@@ -100,18 +117,18 @@ public class Balancer {
         try {
             readers.values().forEach(KafkaMessageReader::stop);
         } catch (Exception e) {
-            logger.error("Error stopping reader: ", e);
+            LOGGER.error("Error stopping reader: ", e);
         }
         try {
             leaderSelectors.forEach(LeaderSelector::close);
         } catch (Exception e) {
-            logger.error("Error closing selector: ", e);
+            LOGGER.error("Error closing selector: ", e);
         }
     }
 
     public void ack(RawEventBundle rawEventBundle) {
         try {
-            logger.info("To ack for: {}", rawEventBundle.getPartitionId());
+            LOGGER.info("To ack for: {}", rawEventBundle.getPartitionId());
             readers.get(rawEventBundle.getPartitionId()).ackMessage(rawEventBundle);
         } catch (Exception e) {
             e.printStackTrace();

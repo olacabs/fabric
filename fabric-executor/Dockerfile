@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016 ANI Technologies Pvt. Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 FROM ubuntu:14.04
 MAINTAINER guruprasad.sridharan@olacabs.com
 
@@ -30,5 +46,5 @@ RUN ln -sf /dev/stdout /var/log/fabric-executor/stdout.log
 
 RUN ln -sf /dev/stderr /var/log/fabric-executor/stderr.log
 
-CMD ["sh", "-c", "java -Xmx${HEAP_SIZE} -Xms${HEAP_SIZE} -Dfile.encoding=utf-8 ${JVM_OPTS} -jar fabric-executor.jar -d ${METRICS_DISABLED} --spec ${SPEC_LOCATION} -g ${GRAPHITE_URL}"]
+CMD ["sh", "-c", "java -Xmx${HEAP_SIZE} -Xms${HEAP_SIZE} -Dfile.encoding=utf-8 ${JVM_OPTS} -jar fabric-executor.jar -d ${METRICS_DISABLED} --spec ${SPEC_LOCATION} -m ${OPENTSDB_URL}"]
 

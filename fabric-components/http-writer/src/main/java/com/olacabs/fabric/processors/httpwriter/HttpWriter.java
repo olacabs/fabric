@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016 ANI Technologies Pvt. Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.olacabs.fabric.processors.httpwriter;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -29,7 +45,11 @@ import org.apache.http.auth.AuthState;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.methods.*;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.auth.BasicScheme;
@@ -47,25 +67,23 @@ import java.util.Properties;
 
 
 /**
- * Created by avanish.pandey on 26/11/15.
- *
- * A processor that sends events to an http end point .
+ * A processor that sends events to an http end point.
  */
 @EqualsAndHashCode(callSuper = true)
 @VisibleForTesting
 @Slf4j
 @Data
 @Processor(
-        namespace = "global",
-        name = "http-writer",
-        version = "1.0.0",
-        description = "A processor that sends events to an HTTP end point!!",
-        cpu = 0.5,
-        memory = 512,
-        processorType = ProcessorType.EVENT_DRIVEN,
-        requiredProperties = {"endpoint_url", "bulk_supported", "http_method" , "auth_enabled"},
-        optionalProperties = {"headers", "should_publish_response", "pool_size", "auth_configuration"}
-)
+    namespace = "global",
+    name = "http-writer",
+    version = "1.0.0",
+    description = "A processor that sends events to an HTTP end point!!",
+    cpu = 0.5,
+    memory = 512,
+    processorType = ProcessorType.EVENT_DRIVEN,
+    requiredProperties = {"endpoint_url", "bulk_supported", "http_method", "auth_enabled"},
+    optionalProperties = {"headers", "should_publish_response", "pool_size", "auth_configuration"}
+    )
 public class HttpWriter extends StreamingProcessor {
 
     private static final int DEFAULT_POOL_SIZE = 10;
@@ -78,32 +96,32 @@ public class HttpWriter extends StreamingProcessor {
     private boolean bulkSupported;
     private String httpMethod;
     private CloseableHttpClient client;
-    private HttpClientBuilder builder;
+    private HttpClientBuilder httpClientBuilder;
     private boolean shouldPublishResponse;
     private Boolean authEnabled;
 
     /**
-     * Starts the HttpClient and Manager
+     * Starts the HttpClient and Manager.
      */
-    protected void start(AuthConfiguration authConfiguration , Boolean authEnabled) throws InitializationException {
+    protected void start(AuthConfiguration authConfiguration, Boolean authEnabledParam) throws InitializationException {
         this.manager = new PoolingHttpClientConnectionManager();
         manager.setMaxTotal(poolSize);
         manager.setDefaultMaxPerRoute(poolSize);
         //client = HttpClients.custom().setConnectionManager(manager).build();
-        builder = HttpClients.custom();
-        builder.setConnectionManager(manager);
-        if(authEnabled) {
-            setAuth(authConfiguration, builder);
+        httpClientBuilder = HttpClients.custom();
+        httpClientBuilder.setConnectionManager(manager);
+        if (authEnabledParam) {
+            setAuth(authConfiguration, httpClientBuilder);
         }
-        client = builder.build();
+        client = httpClientBuilder.build();
     }
 
     /**
-     * Stop the HttpClient and Manager
+     * Stop the HttpClient and Manager.
      *
      * @throws IOException
      */
-    private  void stop() throws IOException {
+    private void stop() throws IOException {
         client.close();
         manager.close();
     }
@@ -111,7 +129,7 @@ public class HttpWriter extends StreamingProcessor {
     @Override
     protected EventSet consume(ProcessingContext processingContext, EventSet eventSet) throws ProcessingException {
         log.debug("Method - {}", this.getHttpMethod().toLowerCase());
-        return this.handleRequest(eventSet,this.getHttpMethod().toLowerCase());
+        return this.handleRequest(eventSet, this.getHttpMethod().toLowerCase());
     }
 
     private EventSet handleRequest(EventSet eventSet, String httpMethodType) throws ProcessingException {
@@ -119,7 +137,7 @@ public class HttpWriter extends StreamingProcessor {
         EventSet.EventFromEventBuilder eventSetBuilder = EventSet.eventFromEventBuilder();
         HttpRequestBase request = null;
         boolean entityEnclosable = false;
-        switch(httpMethodType) {
+        switch (httpMethodType) {
             case "get":
                 request = createHttpGet();
                 break;
@@ -147,19 +165,20 @@ public class HttpWriter extends StreamingProcessor {
             try {
                 log.debug("Event in json format :  {}", event.getJsonNode());
                 if (!isBulkSupported()) {
-                    if(entityEnclosable) {
-                        ((HttpEntityEnclosingRequest) request).setEntity(new ByteArrayEntity((byte[])event.getData()));
+                    if (entityEnclosable) {
+                        ((HttpEntityEnclosingRequest) request).setEntity(new ByteArrayEntity((byte[]) event.getData()));
                     }
                     response = getClient().execute(request);
                     handleResponse(response);
-                    if (shouldPublishResponse){
-                        Event e= Event.builder()
-                                .jsonNode(getMapper().convertValue(createResponseMap(event, response, httpMethodType), JsonNode.class))
-                                .build();
+                    if (shouldPublishResponse) {
+                        Event e = Event.builder()
+                            .jsonNode(getMapper().convertValue(createResponseMap(event, response, httpMethodType),
+                                JsonNode.class))
+                            .build();
                         e.setProperties(event.getProperties());
                         eventSetBuilder.isAggregate(false)
-                                .partitionId(eventSet.getPartitionId())
-                                .event(e);
+                            .partitionId(eventSet.getPartitionId())
+                            .event(e);
                     }
                 } else {
                     builder.add(event.getData());
@@ -175,8 +194,9 @@ public class HttpWriter extends StreamingProcessor {
         if (isBulkSupported()) {
             try {
                 log.debug("Making Bulk call as bulk is supported");
-                if(entityEnclosable) {
-                    ((HttpEntityEnclosingRequest)request).setEntity(new ByteArrayEntity(getMapper().writeValueAsBytes(builder.build())));
+                if (entityEnclosable) {
+                    ((HttpEntityEnclosingRequest) request).setEntity(new ByteArrayEntity(getMapper()
+                        .writeValueAsBytes(builder.build())));
                 }
                 response = client.execute(request);
                 handleResponse(response);
@@ -187,8 +207,9 @@ public class HttpWriter extends StreamingProcessor {
                 close(response);
             }
         } else {
-            if (shouldPublishResponse)
+            if (shouldPublishResponse) {
                 return eventSetBuilder.build();
+            }
         }
         return null;
 
@@ -206,7 +227,6 @@ public class HttpWriter extends StreamingProcessor {
         HttpPut put = new HttpPut(this.getEndPointUrl());
         return put;
     }
-
 
 
     private HttpGet createHttpGet() {
@@ -231,12 +251,17 @@ public class HttpWriter extends StreamingProcessor {
         return post;
     }
 
-    @Override
-    public void initialize(String instanceId, Properties globalProperties, Properties properties, ComponentMetadata componentMetadata) throws InitializationException {
-        this.endPointUrl = ComponentPropertyReader.readString(properties, globalProperties, "endpoint_url", instanceId, componentMetadata);
-        this.headerString = ComponentPropertyReader.readString(properties, globalProperties, "headers", instanceId, componentMetadata);
-        this.httpMethod = ComponentPropertyReader.readString(properties, globalProperties, "http_method", instanceId, componentMetadata);
-        this.shouldPublishResponse = ComponentPropertyReader.readBoolean(properties, globalProperties, "should_publish_response", instanceId, componentMetadata, false);
+    @Override public void initialize(String instanceId, Properties globalProperties, Properties properties,
+            ComponentMetadata componentMetadata) throws InitializationException {
+        this.endPointUrl = ComponentPropertyReader
+                .readString(properties, globalProperties, "endpoint_url", instanceId, componentMetadata);
+        this.headerString = ComponentPropertyReader
+                .readString(properties, globalProperties, "headers", instanceId, componentMetadata);
+        this.httpMethod = ComponentPropertyReader
+                .readString(properties, globalProperties, "http_method", instanceId, componentMetadata);
+        this.shouldPublishResponse = ComponentPropertyReader
+                .readBoolean(properties, globalProperties, "should_publish_response", instanceId, componentMetadata,
+                        false);
         this.mapper = new ObjectMapper();
         if (!Strings.isNullOrEmpty(headerString)) {
             TypeReference<HashMap<String, String>> typeReference = new TypeReference<HashMap<String, String>>() {
@@ -249,15 +274,19 @@ public class HttpWriter extends StreamingProcessor {
             }
         }
 
-        this.bulkSupported = ComponentPropertyReader.readBoolean(properties, globalProperties, "bulk_supported", instanceId, componentMetadata, false);
-        this.poolSize = ComponentPropertyReader.readInteger(properties, globalProperties, "pool_size", instanceId, componentMetadata, DEFAULT_POOL_SIZE);
-        this.authEnabled = ComponentPropertyReader.readBoolean(properties, globalProperties, "auth_enabled", instanceId, componentMetadata,false);
+        this.bulkSupported = ComponentPropertyReader.readBoolean(properties, globalProperties, "bulk_supported",
+            instanceId, componentMetadata, false);
+        this.poolSize = ComponentPropertyReader.readInteger(properties, globalProperties, "pool_size", instanceId,
+            componentMetadata, DEFAULT_POOL_SIZE);
+        this.authEnabled = ComponentPropertyReader.readBoolean(properties, globalProperties, "auth_enabled", instanceId,
+            componentMetadata, false);
         try {
             AuthConfiguration authConfiguration = null;
-            if(authEnabled) {
-                authConfiguration = getMapper().readValue(ComponentPropertyReader.readString(properties, globalProperties, "auth_configuration", instanceId, componentMetadata), AuthConfiguration.class);
+            if (authEnabled) {
+                authConfiguration = getMapper().readValue(ComponentPropertyReader.readString(properties,
+                    globalProperties, "auth_configuration", instanceId, componentMetadata), AuthConfiguration.class);
             }
-            start(authConfiguration , authEnabled);
+            start(authConfiguration, authEnabled);
         } catch (Exception e) {
             log.error("Unable to start the httpclient - {}", e);
             throw new InitializationException();
@@ -266,28 +295,25 @@ public class HttpWriter extends StreamingProcessor {
     }
 
 
-
-
     /**
-     * creates a response map that can be set in the new event set
+     * creates a response map that can be set in the new event set.
      *
      * @param event          event to be added in the response
      * @param response       http response
      * @param httpMethodType the http method type
      * @return req
      */
-    private Map<String, Object> createResponseMap(Event event, CloseableHttpResponse response, String httpMethodType) throws IOException {
-        return ImmutableMap.of("SourceEvent", event.getJsonNode(),
-                "HttpMethod", httpMethodType,
-                "HttpResponseCode",response.getStatusLine().getStatusCode(),
-                "HttpResponse", getResponseAsJson(response));
+    private Map<String, Object> createResponseMap(Event event, CloseableHttpResponse response, String httpMethodType)
+            throws IOException {
+        return ImmutableMap.of("SourceEvent", event.getJsonNode(), "HttpMethod", httpMethodType, "HttpResponseCode",
+                response.getStatusLine().getStatusCode(), "HttpResponse", getResponseAsJson(response));
     }
 
     private JsonNode getResponseAsJson(CloseableHttpResponse response) throws IOException {
         try {
             if (null != response) {
                 final HttpEntity entity = response.getEntity();
-                if(null != entity) {
+                if (null != entity) {
                     final String responseStr = EntityUtils.toString(entity);
                     try {
                         return (!Strings.isNullOrEmpty(responseStr)) ? getMapper().readTree(responseStr) : null;
@@ -312,12 +338,13 @@ public class HttpWriter extends StreamingProcessor {
     }
 
 
-    private void setAuth(AuthConfiguration authConfiguration, HttpClientBuilder builder ) throws InitializationException{
+    private void setAuth(AuthConfiguration authConfiguration, HttpClientBuilder builder)
+            throws InitializationException {
         if (!Strings.isNullOrEmpty(authConfiguration.getUsername())) {
-            Credentials credentials = new UsernamePasswordCredentials(authConfiguration.getUsername(), authConfiguration.getPassword());
+            Credentials credentials =
+                    new UsernamePasswordCredentials(authConfiguration.getUsername(), authConfiguration.getPassword());
             CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-            credentialsProvider.setCredentials(
-                    new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), credentials);
+            credentialsProvider.setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), credentials);
 
             builder.addInterceptorFirst((HttpRequestInterceptor) (request, context) -> {
                 AuthState authState = (AuthState) context.getAttribute(HttpClientContext.TARGET_AUTH_STATE);
@@ -334,6 +361,6 @@ public class HttpWriter extends StreamingProcessor {
         }
     }
 
-
 }
+
 

@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016 ANI Technologies Pvt. Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.olacabs.fabric.executor.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,12 +34,12 @@ import java.net.InetAddress;
 import java.util.List;
 
 /**
- * Created by santanu.s on 22/09/15.
+ * TODO doc.
  */
 public class HttpMetadataSource implements MetadataSource {
-    private static final Logger logger = LoggerFactory.getLogger(HttpMetadataSource.class);
-    private HttpClient httpClient = HttpClients.createDefault();
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpMetadataSource.class);
     private final ObjectMapper mapper;
+    private HttpClient httpClient = HttpClients.createDefault();
     private MesosDnsResolver dnsResolver;
 
     public HttpMetadataSource(ObjectMapper mapper, MesosDnsResolver dnsResolver) {
@@ -43,15 +59,16 @@ public class HttpMetadataSource implements MetadataSource {
 
             if (!results.isEmpty()) {
                 specHost = InetAddress.getByName(results.get(0).host()).getHostAddress() + ":" + results.get(0).port();
-                logger.info("Setting spec host to: " + specHost);
+                LOGGER.info("Setting spec host to: " + specHost);
             } else {
                 throw new RuntimeException(String.format("Dns Srv Resolution for spec host failed: %s", specHost));
             }
-            specEndpoint = specEndpoint.split("//")[0] + "//" + specHost + "/" + specEndpoint.split("//")[1].replaceFirst(".*\\./", "");
+            specEndpoint = specEndpoint.split("//")[0] + "//" + specHost + "/" + specEndpoint.split("//")[1]
+                    .replaceFirst(".*\\./", "");
         }
         HttpGet getRequest = new HttpGet(specEndpoint);
         HttpResponse response = httpClient.execute(getRequest);
-        if(HttpStatus.SC_OK != response.getStatusLine().getStatusCode()) {
+        if (HttpStatus.SC_OK != response.getStatusLine().getStatusCode()) {
             throw new Exception("Received: " + response.getStatusLine().getStatusCode() + " from spec url: " + url);
         }
 

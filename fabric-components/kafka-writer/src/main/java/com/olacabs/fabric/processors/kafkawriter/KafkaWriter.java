@@ -1,7 +1,21 @@
+/*
+ * Copyright 2016 ANI Technologies Pvt. Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.olacabs.fabric.processors.kafkawriter;
 
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.SharedMetricRegistries;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
@@ -29,32 +43,32 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * Created by syed.abdul.kather on 25/11/15.
+ * TODO Javadoc.
  */
 @Processor(
-        namespace = "global",
-        name = "kafka-writer",
-        version = "2.0",
-        description = "A processor that write data into kafka",
-        cpu = 0.1,
-        memory = 1,
-        processorType = ProcessorType.EVENT_DRIVEN,
-        requiredProperties = {
-                "brokerList",
-                "ingestionPoolSize",
-                "kafkaKeyJsonPath"
-        },
-        optionalProperties = {
-                "isTopicOnJsonPath",
-                "topic",
-                "topicJsonPath",
-                "ignoreError",
-                "kafkaSerializerClass",
-                "ackCount"
-        })
+    namespace = "global",
+    name = "kafka-writer",
+    version = "2.0",
+    description = "A processor that write data into kafka",
+    cpu = 0.1,
+    memory = 1,
+    processorType = ProcessorType.EVENT_DRIVEN,
+    requiredProperties = {
+        "brokerList",
+        "ingestionPoolSize",
+        "kafkaKeyJsonPath"
+    },
+    optionalProperties = {
+        "isTopicOnJsonPath",
+        "topic",
+        "topicJsonPath",
+        "ignoreError",
+        "kafkaSerializerClass",
+        "ackCount"
+    })
 public class KafkaWriter extends StreamingProcessor {
 
-    private static final Logger logger = LoggerFactory.getLogger(KafkaWriter.class.getSimpleName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaWriter.class.getSimpleName());
 
     private static final boolean DEFAULT_IGNORE_SERIALIZATION_ERROR = false;
     private static final boolean DEFAULT_TOPIC_ON_JSON_PATH = false;
@@ -62,7 +76,7 @@ public class KafkaWriter extends StreamingProcessor {
     private static final String DEFAULT_KAFKA_KEY_JSON_PATH = "/metadata/partitionKey/value";
     private static final int DEFAULT_ACK_COUNT = 1;
     private static final int DEFAULT_BATCH_SIZE = 10;
-    private static final String ACK_COUNT = "-1" ;
+    private static final String ACK_COUNT = "-1";
 
     private String kafkaKeyJsonPath;
     private boolean ignoreError;
@@ -97,7 +111,7 @@ public class KafkaWriter extends StreamingProcessor {
                 try {
                     convertedMessage = convertEvent(event);
                 } catch (ProcessingException e) {
-                    logger.error("Error converting byte stream to event: ", e);
+                    LOGGER.error("Error converting byte stream to event: ", e);
                     throw new RuntimeException(e);
                 }
                 if (null != convertedMessage) {
@@ -105,7 +119,7 @@ public class KafkaWriter extends StreamingProcessor {
                 }
             });
         } catch (final Exception e) {
-            logger.error("Error converting byte stream to event: ", e);
+            LOGGER.error("Error converting byte stream to event: ", e);
             throw new ProcessingException(e);
         }
         Lists.partition(messages, ingestionPoolSize).forEach(messageList -> getProducer().send(messageList));
@@ -113,7 +127,7 @@ public class KafkaWriter extends StreamingProcessor {
     }
 
     /**
-     * convert the event into Kafka keyed messages
+     * convert the event into Kafka keyed messages.
      *
      * @param event to convert
      * @return KeyedMessage
@@ -125,16 +139,16 @@ public class KafkaWriter extends StreamingProcessor {
                 try {
                     eventData = mapper.readTree((byte[]) event.getData());
                 } catch (IOException e) {
-                    logger.error("Error converting byte stream to event: ", e);
+                    LOGGER.error("Error converting byte stream to event: ", e);
                     if (!ignoreError) {
-                        logger.error("Error converting byte stream to event");
+                        LOGGER.error("Error converting byte stream to event");
                         throw new ProcessingException("Error converting byte stream to event", e);
                     }
                     return null;
                 }
             } else {
                 if (!ignoreError) {
-                    logger.error("Error converting byte stream to event: Event is not byte stream");
+                    LOGGER.error("Error converting byte stream to event: Event is not byte stream");
                     throw new ProcessingException("Error converting byte stream to event: Event is not byte stream");
                 }
                 return null;
@@ -142,51 +156,60 @@ public class KafkaWriter extends StreamingProcessor {
         }
 
         final String kafkaKey = kafkaKeyJsonPath != null
-                ? eventData.at(kafkaKeyJsonPath).asText().replace("\"", "")
-                : eventData.at(DEFAULT_KAFKA_KEY_JSON_PATH).asText().replace("\"", "");
+            ? eventData.at(kafkaKeyJsonPath).asText().replace("\"", "")
+            : eventData.at(DEFAULT_KAFKA_KEY_JSON_PATH).asText().replace("\"", "");
 
         final String topic = isTopicOnJsonPath()
-                ? eventData.at(getKafkaTopicJsonPath()).toString().replace("\"", "")
-                : getKafkaTopic().replace("\"", "");
+            ? eventData.at(getKafkaTopicJsonPath()).toString().replace("\"", "")
+            : getKafkaTopic().replace("\"", "");
 
         return new KeyedMessage<>(topic, kafkaKey, eventData.toString());
     }
 
 
     @Override
-    public void initialize(String instanceId, Properties globalProperties, Properties properties, ComponentMetadata componentMetadata) throws InitializationException {
+    public void initialize(String instanceId, Properties globalProperties, Properties properties,
+            ComponentMetadata componentMetadata) throws InitializationException {
 
         final String kafkaBrokerList = ComponentPropertyReader
                 .readString(properties, globalProperties, "brokerList", instanceId, componentMetadata);
         isTopicOnJsonPath = ComponentPropertyReader
-                .readBoolean(properties, globalProperties, "isTopicOnJsonPath", instanceId, componentMetadata, DEFAULT_TOPIC_ON_JSON_PATH);
+                .readBoolean(properties, globalProperties, "isTopicOnJsonPath", instanceId, componentMetadata,
+                        DEFAULT_TOPIC_ON_JSON_PATH);
 
         if (!isTopicOnJsonPath) {
-            kafkaTopic = ComponentPropertyReader.readString(properties, globalProperties, "topic", instanceId, componentMetadata);
+            kafkaTopic = ComponentPropertyReader
+                    .readString(properties, globalProperties, "topic", instanceId, componentMetadata);
             if (kafkaTopic == null) {
-                logger.error("Kafka topic in properties not found");
+                LOGGER.error("Kafka topic in properties not found");
                 throw new RuntimeException("Kafka topic in properties not found");
             }
             setKafkaTopic(kafkaTopic);
         } else {
-            kafkaTopicJsonPath = ComponentPropertyReader.readString(properties, globalProperties, "topicJsonPath", instanceId, componentMetadata);
+            kafkaTopicJsonPath = ComponentPropertyReader
+                    .readString(properties, globalProperties, "topicJsonPath", instanceId, componentMetadata);
             if (kafkaTopicJsonPath == null) {
-                logger.error("Kafka topic json path  not found");
+                LOGGER.error("Kafka topic json path  not found");
                 throw new RuntimeException("Kafka topic json path  not found");
             }
             setKafkaTopicJsonPath(kafkaTopicJsonPath);
         }
 
         kafkaKeyJsonPath = ComponentPropertyReader
-                .readString(properties, globalProperties, "kafkaKeyJsonPath", instanceId, componentMetadata, DEFAULT_KAFKA_KEY_JSON_PATH);
+                .readString(properties, globalProperties, "kafkaKeyJsonPath", instanceId, componentMetadata,
+                        DEFAULT_KAFKA_KEY_JSON_PATH);
         final String kafkaSerializerClass = ComponentPropertyReader
-                .readString(properties, globalProperties, "kafkaSerializerClass", instanceId, componentMetadata, DEFAULT_SERIALIZER_CLASS);
+                .readString(properties, globalProperties, "kafkaSerializerClass", instanceId, componentMetadata,
+                        DEFAULT_SERIALIZER_CLASS);
         ingestionPoolSize = ComponentPropertyReader
-                .readInteger(properties, globalProperties, "ingestionPoolSize", instanceId, componentMetadata, DEFAULT_BATCH_SIZE);
+                .readInteger(properties, globalProperties, "ingestionPoolSize", instanceId, componentMetadata,
+                        DEFAULT_BATCH_SIZE);
         final Integer ackCount = ComponentPropertyReader
-                .readInteger(properties, globalProperties, "ackCount", instanceId, componentMetadata, DEFAULT_ACK_COUNT);
+                .readInteger(properties, globalProperties, "ackCount", instanceId, componentMetadata,
+                        DEFAULT_ACK_COUNT);
         ignoreError = ComponentPropertyReader
-                .readBoolean(properties, globalProperties, "ignoreError", instanceId, componentMetadata, DEFAULT_IGNORE_SERIALIZATION_ERROR);
+                .readBoolean(properties, globalProperties, "ignoreError", instanceId, componentMetadata,
+                        DEFAULT_IGNORE_SERIALIZATION_ERROR);
 
         final Properties props = new Properties();
         props.put("metadata.broker.list", kafkaBrokerList);
@@ -197,12 +220,12 @@ public class KafkaWriter extends StreamingProcessor {
 
         producer = new Producer<>(new ProducerConfig(props));
         mapper = new ObjectMapper();
-        logger.info("Initialized kafka writer...");
+        LOGGER.info("Initialized kafka writer...");
     }
 
     @Override
     public void destroy() {
         producer.close();
-        logger.info("Closed kafka writer...");
+        LOGGER.info("Closed kafka writer...");
     }
 }

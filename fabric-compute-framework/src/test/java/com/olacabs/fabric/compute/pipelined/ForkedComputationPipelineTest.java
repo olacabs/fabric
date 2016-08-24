@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016 ANI Technologies Pvt. Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.olacabs.fabric.compute.pipelined;
 
 import com.olacabs.fabric.compute.builder.Linker;
@@ -13,10 +29,11 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Properties;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
- * Created by santanu.s on 12/09/15.
+ * Doc.
  */
 public class ForkedComputationPipelineTest {
 
@@ -30,10 +47,10 @@ public class ForkedComputationPipelineTest {
         properties.put("computation.disruptor.wait_strategy", "Yield ");
 
         RegisteringLoader loader = RegisteringLoader.builder()
-                .source("memory", new MemoryBasedPipelineStreamPipelineSource())
-                .stage("generator", new EventGeneratorProcessor())
-                .stage("printer", new PrinterStreamingProcessor())
-                .build();
+            .source("memory", new MemoryBasedPipelineStreamPipelineSource())
+            .stage("generator", new EventGeneratorProcessor())
+            .stage("printer", new PrinterStreamingProcessor())
+            .build();
 
         Linker linker = new Linker(loader);
 
@@ -42,41 +59,41 @@ public class ForkedComputationPipelineTest {
         final String pid2 = "printer_1";
 
         ComputationSpec spec = ComputationSpec.builder()
-                .name("test-pipeline")
-                .source(
-                        ComponentInstance.builder()
-                                .id(sourceId)
-                                .meta(
-                                        ComponentMetadata.builder()
-                                                .type(ComponentType.SOURCE)
-                                                .id(sourceId)
-                                                .name("memory")
-                                                .build())
-                                .build())
-                .processor(
-                        ComponentInstance.builder()
-                                .id(pid1)
-                                .meta(
-                                        ComponentMetadata.builder()
-                                                .type(ComponentType.PROCESSOR)
-                                                .id(pid1)
-                                                .name("generator")
-                                                .build())
-                                .build())
-                .processor(
-                        ComponentInstance.builder()
-                                .id(pid2)
-                                .meta(
-                                        ComponentMetadata.builder()
-                                                .type(ComponentType.PROCESSOR)
-                                                .id(pid2)
-                                                .name("printer")
-                                                .build())
-                                .build())
-                .connection(Connection.builder().fromType(ComponentType.SOURCE).from(sourceId).to(pid1).build())
-                .connection(Connection.builder().fromType(ComponentType.PROCESSOR).from(pid1).to(pid2).build())
-                .properties(properties)
-                .build();
+            .name("test-pipeline")
+            .source(
+                ComponentInstance.builder()
+                    .id(sourceId)
+                    .meta(
+                        ComponentMetadata.builder()
+                            .type(ComponentType.SOURCE)
+                            .id(sourceId)
+                            .name("memory")
+                            .build())
+                    .build())
+            .processor(
+                ComponentInstance.builder()
+                    .id(pid1)
+                    .meta(
+                        ComponentMetadata.builder()
+                            .type(ComponentType.PROCESSOR)
+                            .id(pid1)
+                            .name("generator")
+                            .build())
+                    .build())
+            .processor(
+                ComponentInstance.builder()
+                    .id(pid2)
+                    .meta(
+                        ComponentMetadata.builder()
+                            .type(ComponentType.PROCESSOR)
+                            .id(pid2)
+                            .name("printer")
+                            .build())
+                    .build())
+            .connection(Connection.builder().fromType(ComponentType.SOURCE).from(sourceId).to(pid1).build())
+            .connection(Connection.builder().fromType(ComponentType.PROCESSOR).from(pid1).to(pid2).build())
+            .properties(properties)
+            .build();
         ComputationPipeline pipeline = linker.build(spec);
         pipeline.initialize(properties);
 

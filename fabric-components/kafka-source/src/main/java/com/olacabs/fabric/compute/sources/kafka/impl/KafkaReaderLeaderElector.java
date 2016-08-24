@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016 ANI Technologies Pvt. Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.olacabs.fabric.compute.sources.kafka.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,10 +42,10 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Created by santanu.s on 14/10/15.
+ * TODO java doc.
  */
 public class KafkaReaderLeaderElector implements LeaderSelectorListener {
-    private static final Logger logger = LoggerFactory.getLogger(KafkaReaderLeaderElector.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaReaderLeaderElector.class);
 
     private final String topology;
     private final String topic;
@@ -47,7 +63,8 @@ public class KafkaReaderLeaderElector implements LeaderSelectorListener {
     private Map<Integer, AtomicBoolean> isRunning = Maps.newHashMap();
     private Set<String> knownMembers = Sets.newHashSet();
 
-    public KafkaReaderLeaderElector(String topology, String topic, Map<Integer, KafkaMessageReader> readers, CuratorFramework curatorFramework, ObjectMapper mapper) {
+    public KafkaReaderLeaderElector(String topology, String topic, Map<Integer, KafkaMessageReader> readers,
+            CuratorFramework curatorFramework, ObjectMapper mapper) {
         this.topology = topology;
         this.topic = topic;
         this.readers = readers;
@@ -63,47 +80,50 @@ public class KafkaReaderLeaderElector implements LeaderSelectorListener {
             isRunning.put(partiton, new AtomicBoolean(false));
         });
         scheduler.scheduleWithFixedDelay(() -> {
-            logger.debug("Checking zookeeper");
+            LOGGER.debug("Checking zookeeper");
             try {
                 readers.keySet().forEach(partiton -> {
                     try {
                         final String communicatorPath = communicatorPath(partiton);
-                        byte data[] = curatorFramework.getData().forPath(communicatorPath);
+                        byte[] data = curatorFramework.getData().forPath(communicatorPath);
                         final String selectedReader = new String(data);
                         if (readerId.equals(selectedReader)) {
                             if (isRunning.get(partiton).compareAndSet(false, true)) {
-                                logger.info("[{}:{}:{}] Got start", topology, topic, partiton);
+                                LOGGER.info("[{}:{}:{}] Got start", topology, topic, partiton);
                                 executorService.submit(readers.get(partiton));
                             } else {
-                                logger.debug("[{}:{}:{}] Nothing changed .. already running...", topology, topic, partiton);
+                                LOGGER.debug("[{}:{}:{}] Nothing changed .. already running...", topology, topic,
+                                        partiton);
                             }
                         } else {
                             if (isRunning.get(partiton).compareAndSet(true, false)) {
-                                logger.info("[{}:{}:{}] Got stop", topology, topic, partiton);
+                                LOGGER.info("[{}:{}:{}] Got stop", topology, topic, partiton);
                                 readers.get(partiton).stop();
                             } else {
-                                logger.debug("[{}:{}:{}] Nothing changed .. already stopped...", topology, topic, partiton);
+                                LOGGER.debug("[{}:{}:{}] Nothing changed .. already stopped...", topology, topic,
+                                        partiton);
                             }
                         }
                     } catch (KeeperException.NoNodeException e) {
-                        logger.info("[{}:{}:{}] Communicator not yet initialized", topology, topic, partiton);
+                        LOGGER.info("[{}:{}:{}] Communicator not yet initialized", topology, topic, partiton);
                     } catch (Throwable e) {
-                        logger.error("[{}:{}:{}] Error reading ZK node for reader id", topology, topic, partiton);
+                        LOGGER.error("[{}:{}:{}] Error reading ZK node for reader id", topology, topic, partiton);
                         throw new RuntimeException(e);
                     }
                 });
                 peerCountChange();
             } catch (Throwable t) {
-                logger.info("Error detecting membership changes.", t);
+                LOGGER.info("Error detecting membership changes.", t);
             }
         }, 0, 10, TimeUnit.SECONDS);
-        logger.info("[{}:{}:{}] Creating communicators", topology, topic, memberPathPrefix());
-        logger.info("[{}:{}:{}] Watching reader path: {}", topology, topic, memberPathPrefix());
+        LOGGER.info("[{}:{}:{}] Creating communicators", topology, topic, memberPathPrefix());
+        LOGGER.info("[{}:{}:{}] Watching reader path: {}", topology, topic, memberPathPrefix());
         final String leaderPath = String.format("/%s/%s/loadbalancer-leader", topology, topic);
         this.leaderSelector = new LeaderSelector(curatorFramework, leaderPath, this);
-        logger.info("Starting leader selector at: " + leaderPath);
-        curatorFramework.create().creatingParentContainersIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(memberPath());
-        logger.info("Member path created at: " + memberPath());
+        LOGGER.info("Starting leader selector at: " + leaderPath);
+        curatorFramework.create().creatingParentContainersIfNeeded().withMode(CreateMode.EPHEMERAL)
+                .forPath(memberPath());
+        LOGGER.info("Member path created at: " + memberPath());
         leaderSelector.start();
     }
 
@@ -119,7 +139,7 @@ public class KafkaReaderLeaderElector implements LeaderSelectorListener {
 
     @Override
     public void takeLeadership(CuratorFramework client) throws Exception {
-        logger.info("[{}:{}] This coordinator became the leader.", topology, topic);
+        LOGGER.info("[{}:{}] This coordinator became the leader.", topology, topic);
         peerCountChange(true);
         while (true) {
             lock.lock();
@@ -128,7 +148,7 @@ public class KafkaReaderLeaderElector implements LeaderSelectorListener {
                     condition.await();
                 }
                 if (stop.get()) {
-                    logger.info("[{}:{}] Exiting coordinator.", topology, topic);
+                    LOGGER.info("[{}:{}] Exiting coordinator.", topology, topic);
                     return;
                 }
             } finally {
@@ -151,24 +171,24 @@ public class KafkaReaderLeaderElector implements LeaderSelectorListener {
         List<String> members = null;
         try {
             members = curatorFramework.getChildren().forPath(memberPath);
-            logger.debug("Members: " + members);
+            LOGGER.debug("Members: " + members);
             if (Sets.symmetricDifference(knownMembers, Sets.newHashSet(members)).isEmpty() && !force) {
-                logger.debug("No membership changes detected");
+                LOGGER.debug("No membership changes detected");
                 return;
             } //.intersection(knownMembers, Sets.newHashSet(members))
         } catch (Exception e) {
             if (e instanceof KeeperException.NodeExistsException) {
-                logger.info("Looks like this topology/topic combination is being used for the first time");
+                LOGGER.info("Looks like this topology/topic combination is being used for the first time");
             } else {
-                logger.error("Error checking for node on ZK: ", e);
+                LOGGER.error("Error checking for node on ZK: ", e);
             }
         }
         if (null == members) {
-            logger.error("No members found .. how did i come here? ZK issue?");
+            LOGGER.error("No members found .. how did i come here? ZK issue?");
             return;
         }
         if (null == leaderSelector || !leaderSelector.hasLeadership()) {
-            logger.debug("I'm not the leader coordinator");
+            LOGGER.debug("I'm not the leader coordinator");
             return;
         }
         knownMembers = Sets.newHashSet(members);
@@ -176,17 +196,18 @@ public class KafkaReaderLeaderElector implements LeaderSelectorListener {
         AtomicInteger counter = new AtomicInteger(0);
         readers.keySet().forEach(partition -> {
             String selectedReader = finalMembers.get(counter.getAndIncrement() % finalMembers.size());
-            logger.info("[{}:{}:{}] Selected reader: {}", topology, topic, partition, selectedReader);
+            LOGGER.info("[{}:{}:{}] Selected reader: {}", topology, topic, partition, selectedReader);
             final String communicatorPath = communicatorPath(partition);
             try {
-                if (null == curatorFramework.checkExists().creatingParentContainersIfNeeded().forPath(communicatorPath)) {
+                if (null == curatorFramework.checkExists().creatingParentContainersIfNeeded()
+                        .forPath(communicatorPath)) {
                     curatorFramework.create().creatingParentContainersIfNeeded().forPath(communicatorPath);
-                    logger.info("[{}:{}:{}] Created communicator", topology, topic, partition);
+                    LOGGER.info("[{}:{}:{}] Created communicator", topology, topic, partition);
                 }
                 curatorFramework.setData().forPath(communicatorPath, selectedReader.getBytes());
-                logger.error("Set reader at {} to {}", communicatorPath, selectedReader);
+                LOGGER.error("Set reader at {} to {}", communicatorPath, selectedReader);
             } catch (Exception e) {
-                logger.error("Error setting reader value at {} to {}", communicatorPath, selectedReader, e);
+                LOGGER.error("Error setting reader value at {} to {}", communicatorPath, selectedReader, e);
             }
         });
     }
