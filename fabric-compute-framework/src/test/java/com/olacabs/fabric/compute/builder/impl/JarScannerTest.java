@@ -16,11 +16,23 @@
 
 package com.olacabs.fabric.compute.builder.impl;
 
-import java.nio.file.Path;
+import org.junit.Test;
+
+import java.util.Collections;
 
 /**
  * TODO javadoc.
  */
-public interface JarDownloader {
-    Path download(final String url);
+public class JarScannerTest {
+    @Test
+    public void testDownload() throws Exception {
+        JarScanner scanner = new JarScanner();
+        scanner.download(Collections.singletonList(JarScannerTest.class.getResource("/dummy.jar").toString()));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testDownloadThrowsException() throws Exception {
+        JarScanner scanner = new JarScanner();
+        scanner.download(Collections.singletonList(JarScannerTest.class.getResource("/dummy1.jar").toString()));
+    }
 }

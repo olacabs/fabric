@@ -22,13 +22,11 @@ import com.olacabs.fabric.compute.processor.InitializationException;
 import com.olacabs.fabric.compute.processor.ProcessingException;
 import com.olacabs.fabric.compute.processor.ScheduledProcessor;
 import com.olacabs.fabric.model.common.ComponentMetadata;
+import com.olacabs.fabric.model.common.PropertyConstraint;
 import com.olacabs.fabric.model.event.Event;
 import com.olacabs.fabric.model.event.EventSet;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -74,4 +72,12 @@ public class CountingProcessor extends ScheduledProcessor {
 
     }
 
+    // sample only, not used anywhere
+    @Override
+    public List<PropertyConstraint> getPropertyConstraints() {
+        return Collections.singletonList(PropertyConstraint.builder().property("to").dependencyConstraints(Collections
+                .singletonList(PropertyConstraint.DependencyConstraint.builder().property("from")
+                        .operator(PropertyConstraint.Operator.GEQ).value("0").build()))
+                .valueConstraint(PropertyConstraint.ValueConstraint.builder().defaultValue("100").build()).build());
+    }
 }

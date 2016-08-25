@@ -19,8 +19,11 @@ package com.olacabs.fabric.compute.source;
 
 import com.olacabs.fabric.compute.ProcessingContext;
 import com.olacabs.fabric.model.common.ComponentMetadata;
+import com.olacabs.fabric.model.common.PropertyConstraint;
 import com.olacabs.fabric.model.event.RawEventBundle;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -39,6 +42,10 @@ public interface PipelineSource {
 
     default boolean healthcheck() {
         return true;
+    }
+
+    default List<PropertyConstraint> getPropertyConstraints() {
+        return Collections.emptyList();
     }
 
 }

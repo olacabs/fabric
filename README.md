@@ -48,166 +48,170 @@ We need three components for this computation:<br>
 ```
 // Add this annotation for registering the source with the metadata server
 @Source(
-   namespace = "global",
-   name = "random-sentence-source",
-   version = "0.1",
-   description = "A source that generates random sentences from a pool of sentences",
-   cpu = 0.1,
-   memory = 64,
-   requiredProperties = {},
-   optionalProperties = {"randomGeneratorSeed"}
+        namespace = "global",
+        name = "random-sentence-source",
+        version = "0.1",
+        description = "A source that generates random sentences from a pool of sentences",
+        cpu = 0.1,
+        memory = 64,
+        requiredProperties = {},
+        optionalProperties = {"randomGeneratorSeed"}
 )
-public class RandomSentenceSource implements PipelineSource{
- 
-   Random random;
-   String[] sentences = {
-       "A quick brown fox jumped over the lazy dog",
-       "Life is what happens to you when you are busy making other plans",
-       "Mama always said that life is a box of chocolates",
-       "I am going to make you an offer you cannot refuse",
-       "I am speaking to a dead man on the other side of the phone",
-       "The path of the righteous man is beset on all sides by the inequities of the selfish and the tyranny of evil men"
-   };
- 
-   @Override
-   public void initialize(final String instanceName,
-                          final Properties global,
-                          final Properties local,
-                          final ProcessingContext processingContext,
-                          final ComponentMetadata componentMetadata) throws Exception {
-       // this method is called to initialize the source
-       // use this utility method to read properties passed
-       int seed = ComponentPropertyReader.readInteger(local, global, "randomGeneratorSeed", instanceName, componentMetadata, 42);
-       random = new Random(seed);
-   }
-   
-   @Override
-   public RawEventBundle getNewEvents() {
-       // this method is called to get new events
-       return RawEventBundle.builder()
-           .events(getSentences(5).stream()
-               .map(sentence -> Event.builder().id(random.nextInt()).data(sentence.toLowerCase()).build())
-               .collect(Collectors.toCollection(ArrayList::new)))
-           .meta(Collections.emptyMap())
-           .partitionId(Integer.MAX_VALUE)
-           .transactionId(Integer.MAX_VALUE)
-           .build();
-   }
-   
-   private List<String> getSentences(int n) {
-       List<String> listOfSentences = new ArrayList<>();
-       for (int i = 0; i < n; i++) {
-           listOfSentences.add(sentences[random.nextInt(sentences.length)]);
-       }
-       return listOfSentences;
-   }
+public class RandomSentenceSource implements PipelineSource {
+
+    Random random;
+    String[] sentences = {
+            "A quick brown fox jumped over the lazy dog",
+            "Life is what happens to you when you are busy making other plans",
+            "Mama always said that life is a box of chocolates",
+            "I am going to make you an offer you cannot refuse",
+            "I am speaking to a dead man on the other side of the phone",
+            "The path of the righteous man is beset on all sides by the inequities of the selfish and the tyranny of evil men"
+    };
+
+    @Override
+    public void initialize(final String instanceName,
+            final Properties global,
+            final Properties local,
+            final ProcessingContext processingContext,
+            final ComponentMetadata componentMetadata) throws Exception {
+        // this method is called to initialize the source
+        // use this utility method to read properties passed
+        int seed = ComponentPropertyReader
+                .readInteger(local, global, "randomGeneratorSeed", instanceName, componentMetadata, 42);
+        random = new Random(seed);
+    }
+
+    @Override
+    public RawEventBundle getNewEvents() {
+        // this method is called to get new events
+        return RawEventBundle.builder()
+                .events(getSentences(5).stream()
+                        .map(sentence -> Event.builder().id(random.nextInt()).data(sentence.toLowerCase()).build())
+                        .collect(Collectors.toCollection(ArrayList::new)))
+                .meta(Collections.emptyMap())
+                .partitionId(Integer.MAX_VALUE)
+                .transactionId(Integer.MAX_VALUE)
+                .build();
+    }
+
+    private List<String> getSentences(int n) {
+        List<String> listOfSentences = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            listOfSentences.add(sentences[random.nextInt(sentences.length)]);
+        }
+        return listOfSentences;
+    }
 }
 ```
 
 ####SplitterProcessor.java
 ```
 @Processor(
-   namespace = "global",
-   name = "splitter-processor",
-   version = "0.1",
-   cpu = 0.1,
-   memory = 32,
-   description = "A processor that splits sentences by a given delimiter",
-   processorType = ProcessorType.EVENT_DRIVEN,
-   requiredProperties = {},
-   optionalProperties = {"delimiter"}
+        namespace = "global",
+        name = "splitter-processor",
+        version = "0.1",
+        cpu = 0.1,
+        memory = 32,
+        description = "A processor that splits sentences by a given delimiter",
+        processorType = ProcessorType.EVENT_DRIVEN,
+        requiredProperties = {},
+        optionalProperties = {"delimiter"}
 )
-public class SplitterProcessor extends StreamingProcessor{
-   String delimiter;
- 
-   @Override
-   protected EventSet consume(final ProcessingContext processingContext, final EventSet eventSet) throws ProcessingException {
-       List<Event> events = new ArrayList<>();
-       eventSet.getEvents().stream()
-           .forEach(event -> {
-               String sentence = (String) event.getData();
-               String[] words = sentence.split(delimiter);
-               events.add(Event.builder()
-                   .data(words)
-                   .id(Integer.MAX_VALUE)
-                   .properties(Collections.emptyMap())
-                   .build());
-           });
-       return EventSet.eventFromEventBuilder()
-           .isAggregate(false)
-           .partitionId(eventSet.getPartitionId())
-           .events(events)
-           .build();
-   }
- 
-   @Override
-   public void initialize(final String instanceName,
-                          final Properties global,
-                          final Properties local,
-                          final ComponentMetadata componentMetadata) throws InitializationException {
-       delimiter = ComponentPropertyReader.readString(local, global, "delimiter", instanceName, componentMetadata, ",");
- 
-   }
- 
-   @Override
-   public void destroy() {
-       // do some cleanup if necessary
-   }
+public class SplitterProcessor extends StreamingProcessor {
+    String delimiter;
+
+    @Override
+    protected EventSet consume(final ProcessingContext processingContext, final EventSet eventSet) throws
+            ProcessingException {
+        List<Event> events = new ArrayList<>();
+        eventSet.getEvents().stream()
+                .forEach(event -> {
+                    String sentence = (String) event.getData();
+                    String[] words = sentence.split(delimiter);
+                    events.add(Event.builder()
+                            .data(words)
+                            .id(Integer.MAX_VALUE)
+                            .properties(Collections.emptyMap())
+                            .build());
+                });
+        return EventSet.eventFromEventBuilder()
+                .isAggregate(false)
+                .partitionId(eventSet.getPartitionId())
+                .events(events)
+                .build();
+    }
+
+    @Override
+    public void initialize(final String instanceName,
+            final Properties global,
+            final Properties local,
+            final ComponentMetadata componentMetadata) throws InitializationException {
+        delimiter = ComponentPropertyReader.readString(local, global, "delimiter", instanceName, componentMetadata, ",");
+
+    }
+
+    @Override
+    public void destroy() {
+        // do some cleanup if necessary
+    }
 }
 ```
 
-####WordCounterProcessor.java
+####WordCountProcessor.java
 ```
 @Processor(
-   namespace = "global",
-   name = "word-count-processor",
-   version = "0.2",
-   description = "A processor that prints word frequency counts within a tumbling window",
-   cpu = 0.1,
-   memory = 128,
-   processorType = ProcessorType.TIMER_DRIVEN,
-   requiredProperties = {"triggering_frequency"},
-   optionalProperties = {}
+        namespace = "global",
+        name = "word-count-processor",
+        version = "0.2",
+        description = "A processor that prints word frequency counts within a tumbling window",
+        cpu = 0.1,
+        memory = 128,
+        processorType = ProcessorType.TIMER_DRIVEN,
+        requiredProperties = {"triggering_frequency"},
+        optionalProperties = {}
 )
-public class WordCountProcessor extends ScheduledProcessor{
-   Map<String, Integer> wordCounts = Collections.emptyMap();
-   
-   @Override
-   protected void consume(final ProcessingContext processingContext, final EventSet eventSet) throws ProcessingException {
-       eventSet.getEvents().stream()
-           .forEach(event -> {
-               String[] words = (String[]) event.getData();
-               for (String word: words) {
-                   if (wordCounts.containsKey(word)) {
-                       wordCounts.put(word, wordCounts.get(word) + 1);
-                   } else {
-                       wordCounts.put(word, 1);
-                   }
-               }
-           });
-   }
- 
-   @Override
-   public void initialize(final String instanceName,
-                          final Properties global,
-                          final Properties local,
-                          final ComponentMetadata componentMetadata) throws InitializationException {
-       // nothing to initialize here
-   }
- 
-   @Override
-   public List<Event> timeTriggerHandler(ProcessingContext processingContext) throws ProcessingException {
-       // this method will be called after a fixed interval of time, say 5 seconds
-       System.out.println(Joiner.on(",").withKeyValueSeparator("=").join(wordCounts));
-       wordCounts.clear();
-       // nothing to send to downstream processors
-       return Collections.emptyList();
-   }
- 
-   @Override
-   public void destroy() {
-       wordCounts.clear();
-   }
+public class WordCountProcessor extends ScheduledProcessor {
+    Map<String, Integer> wordCounts = new HashMap<>();
+
+    @Override
+    protected void consume(final ProcessingContext processingContext, final EventSet eventSet) throws
+            ProcessingException {
+        eventSet.getEvents().stream()
+                .forEach(event -> {
+                    String[] words = (String[]) event.getData();
+                    for (String word: words) {
+                        if (wordCounts.containsKey(word)) {
+                            wordCounts.put(word, wordCounts.get(word) + 1);
+                        } else {
+                            wordCounts.put(word, 1);
+                        }
+                    }
+                });
+    }
+
+    @Override
+    public void initialize(final String instanceName,
+            final Properties global,
+            final Properties local,
+            final ComponentMetadata componentMetadata) throws InitializationException {
+        // nothing to initialize here
+    }
+
+    @Override
+    public List<Event> timeTriggerHandler(ProcessingContext processingContext) throws ProcessingException {
+        // this method will be called after a fixed interval of time, say 5 seconds
+        System.out.println(Joiner.on(",").withKeyValueSeparator("=").join(wordCounts));
+        wordCounts.clear();
+        // nothing to send to downstream processors
+        return Collections.emptyList();
+
+    }
+
+    @Override
+    public void destroy() {
+        wordCounts.clear();
+    }
 }
 ```
 
@@ -225,7 +229,7 @@ The json specification for this computation will look like this<br>
     "sources": [{
         "id": "random-sentence-source",
         "meta": {
-            "id": "5600b9cc-b6a9-3631-8582-14ada8b3e2bc",
+            "id": "1cfda5cb-99d4-34e3-83f0-5b1364a92cce",
             "type": "SOURCE",
             "namespace": "global",
             "name": "random-sentence-source",
@@ -240,18 +244,15 @@ The json specification for this computation will look like this<br>
             "memory": 64,
             "source": {
                 "type": "jar",
-                "url": "http://localhost:8080/sample-topology.jar",
-                "groupId": "com.olacabs.fabric",
-                "artifactId": "sample-computation",
-                "version": "0.1"
+                "url": "file:///fabric-sample-processors/target/fabric-sample-processors-1.0-SNAPSHOT.jar"
             }
         },
         "properties": {}
     }],
     "processors": [{
-        "id": "spitter",
+        "id": "splitter-processor",
         "meta": {
-            "id": "0d9b0569-8904-36ab-8116-d8920db27592",
+            "id": "0b749006-d2dd-3684-a521-f76d6ab0dec8",
             "type": "PROCESSOR",
             "namespace": "global",
             "name": "splitter-processor",
@@ -266,17 +267,16 @@ The json specification for this computation will look like this<br>
             "memory": 32,
             "source": {
                 "type": "jar",
-                "url": "http://localhost:8080/sample-topology.jar",
-                "groupId": "com.olacabs.fabric",
-                "artifactId": "sample-computation",
-                "version": "0.1"
+                "url": "file:///fabric-sample-processors/target/fabric-sample-processors-1.0-SNAPSHOT.jar"
             }
         },
-        "properties": {}
+        "properties": {
+            "processor.splitter-processor.delimiter": " "
+        }
     }, {
-        "id": "word-counter",
+        "id": "word-count-processor",
         "meta": {
-            "id": "d0b90596-36ab-7805-8797-d8920bd27952",
+            "id": "59f4fe28-b09b-3447-8bb2-26d3c23dd885",
             "type": "PROCESSOR",
             "namespace": "global",
             "name": "word-count-processor",
@@ -291,25 +291,25 @@ The json specification for this computation will look like this<br>
             "memory": 128,
             "source": {
                 "type": "jar",
-                "url": "http://localhost:8080/sample-topology.jar",
-                "groupId": "com.olacabs.fabric",
-                "artifactId": "sample-computation",
-                "version": "0.1"
+                "url": "file:///fabric-sample-processors/target/fabric-sample-processors-1.0-SNAPSHOT.jar"
             }
         },
-        "properties": {}
+        "properties": {
+            "processor.word-count-processor.triggering_frequency": "5000"
+        }
     }],
     "connections": [{
         "fromType": "SOURCE",
         "from": "random-sentence-source",
-        "to": "splitter"
+        "to": "splitter-processor"
     }, {
         "fromType": "PROCESSOR",
-        "from": "splitter",
-        "to": "word-counter"
+        "from": "splitter-processor",
+        "to": "word-count-processor"
     }],
     "properties": {
-        "computation.name": "word-count-topology"
+        "computation.name": "word-count-topology",
+        "computation.eventset.is_serialized": "false"
     }
 }
 ```
