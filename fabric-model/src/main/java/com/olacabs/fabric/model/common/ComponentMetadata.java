@@ -88,6 +88,10 @@ public class ComponentMetadata {
 
     @Getter
     @Setter
+    private List<PropertyConstraint> propertyDescriptions = new ArrayList<>();
+
+    @Getter
+    @Setter
     private double cpu;
 
     @Getter

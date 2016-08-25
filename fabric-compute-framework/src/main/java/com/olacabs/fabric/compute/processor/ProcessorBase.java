@@ -19,11 +19,13 @@ package com.olacabs.fabric.compute.processor;
 import com.olacabs.fabric.compute.EventCollector;
 import com.olacabs.fabric.compute.ProcessingContext;
 import com.olacabs.fabric.model.common.ComponentMetadata;
+import com.olacabs.fabric.model.common.PropertyConstraint;
 import com.olacabs.fabric.model.event.Event;
 import com.olacabs.fabric.model.event.EventSet;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -58,4 +60,10 @@ public abstract class ProcessorBase {
     public boolean healthcheck() {
         return true;
     }
+
+    public List<PropertyConstraint> getPropertyConstraints() {
+        return Collections.emptyList();
+    }
+
 }
+
