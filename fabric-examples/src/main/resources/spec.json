@@ -35,7 +35,7 @@
       "memory": 64,
       "source": {
         "type": "jar",
-        "url": "file:///Users/shaikidris.ali/github/ola/fabric-sample-processors/target/fabric-examples-1.0.0-SNAPSHOT.jar"
+        "url": "file:///path/to/fabric/fabric-examples/target/fabric-examples-1.0.0-SNAPSHOT.jar"
       }
     },
     "properties": {}
@@ -58,7 +58,7 @@
       "memory": 32,
       "source": {
         "type": "jar",
-        "url": "file:///Users/shaikidris.ali/github/ola/fabric-sample-processors/target/fabric-examples-1.0.0-SNAPSHOT.jar"
+        "url": "file:///path/to/fabric/fabric-examples/target/fabric-examples-1.0.0-SNAPSHOT.jar"
       }
     },
     "properties": {
@@ -82,7 +82,7 @@
       "memory": 128,
       "source": {
         "type": "jar",
-        "url": "file:///Users/shaikidris.ali/github/ola/fabric-sample-processors/target/fabric-examples-1.0.0-SNAPSHOT.jar"
+        "url": "file:///path/to/fabric/fabric-examples/target/fabric-examples-1.0.0-SNAPSHOT.jar"
       }
     },
     "properties": {

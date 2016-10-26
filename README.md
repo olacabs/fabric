@@ -217,11 +217,7 @@ public class WordCountProcessor extends ScheduledProcessor {
 
 `RandomSentenceSource -> SplitterProcessor -> WordCountProcessor`
 
-Let’s suppose all of these classes reside in a single maven project sample-topology<br>
-Suppose the jar sample-topology.jar is hosted at http://localhost:8080
-To register these sources and processors, build and release this project into artifactory and then use the following fabric-server API<br>
-
-The json specification for this computation will look like this<br>
+The json specification for this computation will look like this (assuming you have compiled/packaged everything before-hand)<br>
 
 ```
 {
@@ -244,7 +240,7 @@ The json specification for this computation will look like this<br>
             "memory": 64,
             "source": {
                 "type": "jar",
-                "url": "file:///fabric-sample-processors/target/fabric-sample-processors-1.0-SNAPSHOT.jar"
+                "url": "file:///path/to/fabric/fabric-examples/target/fabric-examples-1.0.0-SNAPSHOT.jar"
             }
         },
         "properties": {}
@@ -267,7 +263,7 @@ The json specification for this computation will look like this<br>
             "memory": 32,
             "source": {
                 "type": "jar",
-                "url": "file:///fabric-sample-processors/target/fabric-sample-processors-1.0-SNAPSHOT.jar"
+                "url": "file:///path/to/fabric/fabric-examples/target/fabric-examples-1.0.0-SNAPSHOT.jar"
             }
         },
         "properties": {
@@ -291,7 +287,7 @@ The json specification for this computation will look like this<br>
             "memory": 128,
             "source": {
                 "type": "jar",
-                "url": "file:///fabric-sample-processors/target/fabric-sample-processors-1.0-SNAPSHOT.jar"
+                "url": "file:///path/to/fabric/fabric-examples/target/fabric-examples-1.0.0-SNAPSHOT.jar"
             }
         },
         "properties": {
@@ -312,6 +308,12 @@ The json specification for this computation will look like this<br>
         "computation.eventset.is_serialized": "false"
     }
 }
+```
+The spec is available at fabric-examples/src/main/resources/spec.json. Please replace _/path/to/json_ with the place where you've checked out Fabric.
+
+The topology can be run using the following command:
+```
+java -jar fabric-executor/target/fabric-executor-1.0.0-SNAPSHOT.jar -f fabric-examples/src/main/resources/spec.json
 ```
 
 ###Benchmarks
