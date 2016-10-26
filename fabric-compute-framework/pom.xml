@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2016 ANI Technologies Pvt. Ltd.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd ">
+    <parent>
+        <artifactId>fabric-compute</artifactId>
+        <groupId>com.olacabs.fabric</groupId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>fabric-compute-framework</artifactId>
+
+    <properties>
+        <guava-retrying.version>2.0.0</guava-retrying.version>
+        <metrics-core.version>3.1.2</metrics-core.version>
+        <metrics-aspectj.version>1.0.0</metrics-aspectj.version>
+        <aspectjrt.version>1.8.2</aspectjrt.version>
+        <javax.el.version>3.0.0</javax.el.version>
+        <httpclient.version>4.5</httpclient.version>
+        <reflections.version>0.9.9-RC2</reflections.version>
+        <jfrog.version>0.16</jfrog.version>
+        <jackson-dataformat.version>2.5.1</jackson-dataformat.version>
+        <disruptor.version>3.3.4</disruptor.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <artifactId>fabric-common</artifactId>
+            <groupId>com.olacabs.fabric</groupId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <artifactId>fabric-model</artifactId>
+            <groupId>com.olacabs.fabric</groupId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.dropwizard</groupId>
+            <artifactId>dropwizard-testing</artifactId>
+            <version>${dropwizard.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.dropwizard</groupId>
+            <artifactId>dropwizard-jackson</artifactId>
+            <version>${dropwizard.version}</version>
+            <!--<scope>test</scope>-->
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.rholder</groupId>
+            <artifactId>guava-retrying</artifactId>
+            <version>${guava-retrying.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.dropwizard</groupId>
+            <artifactId>dropwizard-logging</artifactId>
+            <version>${dropwizard.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-core</artifactId>
+            <version>${metrics-core.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.astefanutti.metrics.aspectj</groupId>
+            <artifactId>metrics-aspectj</artifactId>
+            <version>${metrics-aspectj.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjrt</artifactId>
+            <version>${aspectjrt.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.el</artifactId>
+            <version>${javax.el.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${httpclient.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections-maven</artifactId>
+            <version>${reflections.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jfrog.artifactory.client</groupId>
+            <artifactId>artifactory-java-client-services</artifactId>
+            <version>${jfrog.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-annotations</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-xml</artifactId>
+            <version>${jackson-dataformat.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.lmax</groupId>
+            <artifactId>disruptor</artifactId>
+            <version>${disruptor.version}</version>
+        </dependency>
+
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>bintray-readytalk-maven</id>
+            <name>bintray</name>
+            <url>http://dl.bintray.com/readytalk/maven</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>bintray-readytalk-maven</id>
+            <name>bintray-plugins</name>
+            <url>http://dl.bintray.com/readytalk/maven</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>aspectj-maven-plugin</artifactId>
+                <version>1.7</version>
+                <configuration>
+                    <forceAjcCompile>true</forceAjcCompile>
+                    <sources/>
+                    <weaveDirectories>
+                        <weaveDirectory>${project.build.directory}/classes</weaveDirectory>
+                    </weaveDirectories>
+                    <aspectLibraries>
+                        <aspectLibrary>
+                            <groupId>io.astefanutti.metrics.aspectj</groupId>
+                            <artifactId>metrics-aspectj</artifactId>
+                        </aspectLibrary>
+                    </aspectLibraries>
+                    <complianceLevel>1.8</complianceLevel>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.4.2</version>
+                <configuration>
+                    <createDependencyReducedPom>true</createDependencyReducedPom>
+                    <filters>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>META-INF/*.SF</exclude>
+                                <exclude>META-INF/*.DSA</exclude>
+                                <exclude>META-INF/*.RSA</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
+                </configuration>
+                <!--<executions>-->
+                <!--<execution>-->
+                <!--<phase>package</phase>-->
+                <!--<goals>-->
+                <!--<goal>shade</goal>-->
+                <!--</goals>-->
+                <!--<configuration>-->
+                <!--<shadeTestJar>true</shadeTestJar>-->
+                <!--<transformers>-->
+                <!--<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />-->
+                <!--<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">-->
+                <!--<mainClass>com.olacabs.fabric.compute.pipeline.ComputationPipeline</mainClass>-->
+                <!--</transformer>-->
+                <!--</transformers>-->
+                <!--<relocations>-->
+                <!--<relocation>-->
+                <!--<pattern>org.apache.http</pattern>-->
+                <!--<shadedPattern>com.olacabs.fabric.org.apache.http</shadedPattern>-->
+                <!--</relocation>-->
+                <!--<relocation>-->
+                <!--<pattern>org.apache.commons</pattern>-->
+                <!--<shadedPattern>com.olacabs.fabric.org.apache.commons</shadedPattern>-->
+                <!--</relocation>-->
+                <!--<relocation>-->
+                <!--<pattern>org.hibernate</pattern>-->
+                <!--<shadedPattern>com.olacabs.fabric.org.hibernate</shadedPattern>-->
+                <!--</relocation>-->
+                <!--<relocation>-->
+                <!--<pattern>com.google</pattern>-->
+                <!--<shadedPattern>com.olacabs.fabric.com.google</shadedPattern>-->
+                <!--</relocation>-->
+                <!--<relocation>-->
+                <!--<pattern>com.github</pattern>-->
+                <!--<shadedPattern>com.olacabs.fabric.com.github</shadedPattern>-->
+                <!--</relocation>-->
+                <!--<relocation>-->
+                <!--<pattern>com.fasterxml</pattern>-->
+                <!--<shadedPattern>com.olacabs.fabric.com.fasterxml</shadedPattern>-->
+                <!--</relocation>-->
+                <!--</relocations>-->
+                <!--</configuration>-->
+                <!--</execution>-->
+                <!--</executions>-->
+            </plugin>
+        </plugins>
+    </build>
+</project>
