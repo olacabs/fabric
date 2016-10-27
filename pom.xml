@@ -56,9 +56,9 @@
     </mailingLists>
 
     <scm>
-        <connection>scm:git:git@github.com/olacabs/fabric.git</connection>
+        <connection>scm:git:https://github.com/olacabs/fabric.git</connection>
         <url>https://github.com/olacabs/fabric</url>
-        <developerConnection>scm:git:git@github.com/olacabs/fabric.git
+        <developerConnection>scm:git:https://github.com/olacabs/fabric.git
         </developerConnection>
         <tag>HEAD</tag>
     </scm>
