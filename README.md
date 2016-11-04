@@ -343,4 +343,22 @@ End to end latency to process all messages in seconds (ceiling) averaged over mu
 
 Throughput with best configuration T ~ 166666 events / second<br>
 
-NOTE: Using Disruptor with YieldWaitingStategy instead of LBQ for channel communication actually reduced the throughput<br>
+NOTE: Using Disruptor with YieldWaitingStrategy instead of LBQ for channel communication actually reduced the throughput<br>
+
+###Using Processor Maven Archetype
+
+To create a processor project, please run following command - 
+
+```
+mvn archetype:generate -DarchetypeGroupId=com.olacabs.fabric -DarchetypeArtifactId=fabric-processor-archetype -DarchetypeVersion=0.0.1-SNAPSHOT -DartifactId=<artifact_id_of_your_project> -DgroupId=<group_id_of_your_project> -DinteractiveMode=ture
+```
+Example -
+
+```
+mvn archetype:generate -DarchetypeGroupId=com.olacabs.fabric -DarchetypeArtifactId=fabric-processor-archetype -DarchetypeVersion=0.0.1-SNAPSHOT -DartifactId=fabric-my-processor -DgroupId=com.olacabs.fabric -DinteractiveMode=ture
+```
+What it does -
+  - Creates the pom project for the processor with all the updated version of compute and other related jars.
+  - Creates boiler plate code, with example, for scheduled and stream processor. You can modify the example java file as per your need.
+
+
