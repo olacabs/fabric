@@ -13,7 +13,7 @@
 #limitations under the License.
 
 FROM ubuntu:14.04
-MAINTAINER shashank.g@olacabs.com
+MAINTAINER maintainer@fabric.com
 
 RUN apt-get update --fix-missing \
   && apt-get install -y --no-install-recommends software-properties-common \
