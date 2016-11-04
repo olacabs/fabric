@@ -86,7 +86,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"jvmOpts\": \"\",\n\t\"logLevel\": \"INFO\",\n\t\"metricsDisabled\": false,\n\t\"docker\": {\n\t\t\"networkType\": \"BRIDGE\",\n\t\t\"dockerOpts\": {\n\t\t\t\"parameters\": [{\n\t\t\t\t\"key\": \"add-host\",\n\t\t\t\t\"value\": \"megatron_staging02:10.200.2.196\"\n\t\t\t}, {\n\t\t\t\t\"key\": \"add-host\",\n\t\t\t\t\"value\": \"megatron-server02.staging.sg1.olacabs.com:10.200.2.196\"\n\t\t\t}]\n\t\t}\n\t}\n}"
+                            "raw": ""
 						},
 						"description": "Get marathon application details for running computation"
 					},
