@@ -72,6 +72,7 @@
         <module>fabric-components</module>
         <module>fabric-processor-archetype</module>
         <module>fabric-examples</module>
+        <module>fabric-manager</module>
     </modules>
 
     <properties>

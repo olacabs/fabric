@@ -1,0 +1,447 @@
+/*
+ * Copyright 2016 ANI Technologies Pvt. Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+{
+	"variables": [],
+	"info": {
+		"name": "fabric-manager",
+		"_postman_id": "61e3ebf1-b163-c77d-1af7-01e8da450b0b",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "applications",
+			"description": "",
+			"item": [
+				{
+					"name": "Deploy saved computation",
+					"request": {
+						"url": "http://localhost:18000/v1/applications/{tenant}/{computation-name}",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "X-User",
+								"value": "sumanbn",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"instances\": 3,\n\t\"topologyCpu\": 0.75,\n\t\"topologyMemory\": 1024\n}"
+						},
+						"description": "deploy a computation"
+					},
+					"response": []
+				},
+				{
+					"name": "Get details of deployed/running computation",
+					"request": {
+						"url": "http://localhost:18000/v1/applications/{tenant}/{computation-name}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Tenant-Key",
+								"value": "joiner",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": "get deployed/running computation details"
+					},
+					"response": []
+				},
+				{
+					"name": "Get marathon application details for running computation",
+					"request": {
+						"url": "http://localhost:18000/v1/applications/{tenant}/{computation-name}/marathon",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+                            "raw": ""
+						},
+						"description": "Get marathon application details for running computation"
+					},
+					"response": []
+				},
+				{
+					"name": "Scale up/down the instances of running computation",
+					"request": {
+						"url": "http://localhost:18000/v1/applications/{tenant}/{computation-name}/scale",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "X-User",
+								"value": "sumanbn",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"instances\": 1\n}"
+						},
+						"description": "Scale up/down the instances of running computation"
+					},
+					"response": []
+				},
+				{
+					"name": "Suspend a deployed/running computation",
+					"request": {
+						"url": "http://localhost:18000/v1/applications/{tenant}/{computation-name}/suspend",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "X-User",
+								"value": "sumanbn",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": "Suspend a deployed/running computation"
+					},
+					"response": []
+				},
+				{
+					"name": "Restart a running computation",
+					"request": {
+						"url": "http://localhost:18000/v1/applications/{tenant}/{computation-name}/restart",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "X-User",
+								"value": "sumanbn",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": "Restart a running computation"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a deployed computation",
+					"request": {
+						"url": "http://localhost:18000/v1/applications/{tenant}/{computation-name}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "X-User",
+								"value": "sumanbn",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": "delete a deployed computation(delete app from marathon)"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "components",
+			"description": "",
+			"item": [
+				{
+					"name": "Save component",
+					"request": {
+						"url": "localhost:18000/v1/components",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "X-User",
+								"value": "sumanbn",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"namespace\": \"global\",\n    \"name\": \"sample-component\",\n    \"version\": \"0.0.1\",\n    \"type\": \"PROCESSOR\",\n    \"description\": \"Sample processor\",\n    \"processorType\": \"EVENT_DRIVEN\",\n    \"requiredProperties\": [\n        \"required_property1\"\n    ],\n    \"optionalProperties\": [\n        \"optional_property1\"\n    ],\n    \"cpu\": 1,\n    \"memory\": 512,\n    \"source\": {\n        \"type\": \"artifactory\",\n        \"artifactoryUrl\": \"http://localhost:8080/artifactory\",\n        \"groupId\": \"com.olacabs\",\n        \"artifactId\": \"sample-processor\",\n        \"version\": \"0.0.1-SNAPSHOT\"\n    }\n}"
+						},
+						"description": "Save component"
+					},
+					"response": []
+				},
+				{
+					"name": "Register component from artifact",
+					"request": {
+						"url": "localhost:18000/v1/components/artifact",
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-User",
+								"value": "user",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"groupId\": \"com.olacabs.fabric\",\n\t\"artifactId\": \"sample-processor\",\n\t\"version\": \"0.0.1\"\n}"
+						},
+						"description": "register component from artifact"
+					},
+					"response": []
+				},
+				{
+					"name": "Register component by URL",
+					"request": {
+						"url": "localhost:18000/v1/components/register?url=",
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-User",
+								"value": "suman",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": "register component"
+					},
+					"response": []
+				},
+				{
+					"name": "Get all components",
+					"request": {
+						"url": "localhost:18000/v1/components",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"id\": \"75cc56e6-6b72-44f3-8db5-45f55b5d5dc4\",\n    \"metadata\": {\n        \"timestamp\": 1477473295342,\n        \"schema\": \"book_joiner\",\n        \"schemaVersion\": 1,\n        \"type\": \"EVENT\",\n        \"routingKey\": {\n            \"type\": \"simple\",\n            \"value\": \"1477473295342\"\n        },\n        \"lookupKey\": null,\n        \"tenant\": \"joiner\",\n        \"stream\": \"book_joiner\",\n        \"sender\": null\n    },\n    \"data\": {\n\t\"bookingId\": \"bookingId1\",\n\t\"city\": \"blore\",\n\t\"bookId\": \"book1\"\n    }\n}"
+						},
+						"description": "get all components"
+					},
+					"response": []
+				},
+				{
+					"name": "Get component by Id",
+					"request": {
+						"url": "localhost:18000/v1/components/{id}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"id\": \"75cc56e6-6b72-44f3-8db5-45f55b5d5dc4\",\n    \"metadata\": {\n        \"timestamp\": 1477473295342,\n        \"schema\": \"book_joiner\",\n        \"schemaVersion\": 1,\n        \"type\": \"EVENT\",\n        \"routingKey\": {\n            \"type\": \"simple\",\n            \"value\": \"1477473295342\"\n        },\n        \"lookupKey\": null,\n        \"tenant\": \"joiner\",\n        \"stream\": \"book_joiner\",\n        \"sender\": null\n    },\n    \"data\": {\n\t\"bookingId\": \"bookingId1\",\n\t\"city\": \"blore\",\n\t\"bookId\": \"book1\"\n    }\n}"
+						},
+						"description": "Get component by Id"
+					},
+					"response": []
+				},
+				{
+					"name": "Get all versions of all components",
+					"request": {
+						"url": "localhost:18000/v1/components/versions",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"id\": \"75cc56e6-6b72-44f3-8db5-45f55b5d5dc4\",\n    \"metadata\": {\n        \"timestamp\": 1477473295342,\n        \"schema\": \"book_joiner\",\n        \"schemaVersion\": 1,\n        \"type\": \"EVENT\",\n        \"routingKey\": {\n            \"type\": \"simple\",\n            \"value\": \"1477473295342\"\n        },\n        \"lookupKey\": null,\n        \"tenant\": \"joiner\",\n        \"stream\": \"book_joiner\",\n        \"sender\": null\n    },\n    \"data\": {\n\t\"bookingId\": \"bookingId1\",\n\t\"city\": \"blore\",\n\t\"bookId\": \"book1\"\n    }\n}"
+						},
+						"description": "Get all versions of all components"
+					},
+					"response": []
+				},
+				{
+					"name": "Get a component by namespace, name and version",
+					"request": {
+						"url": "localhost:18000/v1/components/{namespace}/{name}/{version}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"id\": \"75cc56e6-6b72-44f3-8db5-45f55b5d5dc4\",\n    \"metadata\": {\n        \"timestamp\": 1477473295342,\n        \"schema\": \"book_joiner\",\n        \"schemaVersion\": 1,\n        \"type\": \"EVENT\",\n        \"routingKey\": {\n            \"type\": \"simple\",\n            \"value\": \"1477473295342\"\n        },\n        \"lookupKey\": null,\n        \"tenant\": \"joiner\",\n        \"stream\": \"book_joiner\",\n        \"sender\": null\n    },\n    \"data\": {\n\t\"bookingId\": \"bookingId1\",\n\t\"city\": \"blore\",\n\t\"bookId\": \"book1\"\n    }\n}"
+						},
+						"description": "Get a component by namespace, name and version"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "computations",
+			"description": "",
+			"item": [
+				{
+					"name": "Save computation",
+					"request": {
+						"url": "localhost:18000/v1/computations/{tenant}",
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-User",
+								"value": "sumanbn",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"computation-name\",\n    \"ownerEmail\": \"user@email.com\",\n    \"description\": \"Sample decriptionn\",\n    \"attributes\": {},\n    \"sources\": [\n        {\n            \"componentId\": 5,\n            \"id\": \"source\",\n            \"properties\": {\n                \"source.source.brokers\": \"localhost:9092\",\n                \"source.source.zookeeper\": \"localhost:2181\",\n                \"source.source.topic-name\": \"sample-topic\"\n            }\n        }\n    ],\n    \"processors\": [\n        {\n            \"componentId\": 6,\n            \"id\": \"processor\",\n            \"properties\": {\n                \"processor.processor.serviceName\": \"sample-service\",\n                \"processor.processor.zookeeper\": \"localhost:2181\",\n                \"processor.processor.environment\": \"stage\"\n            }\n        }\n    ],\n    \"connections\": [\n        {\n            \"fromType\": \"SOURCE\",\n            \"from\": \"source\",\n            \"to\": \"processor\"\n        }\n    ],\n    \"properties\": {}\n}"
+						},
+						"description": "Save computation"
+					},
+					"response": []
+				},
+				{
+					"name": "Get all computations under a tenant",
+					"request": {
+						"url": "localhost:18000/v1/computations/{tenant}",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"id\": \"75cc56e6-6b72-44f3-8db5-45f55b5d5dc4\",\n    \"metadata\": {\n        \"timestamp\": 1477473295342,\n        \"schema\": \"book_joiner\",\n        \"schemaVersion\": 1,\n        \"type\": \"EVENT\",\n        \"routingKey\": {\n            \"type\": \"simple\",\n            \"value\": \"1477473295342\"\n        },\n        \"lookupKey\": null,\n        \"tenant\": \"joiner\",\n        \"stream\": \"book_joiner\",\n        \"sender\": null\n    },\n    \"data\": {\n\t\"bookingId\": \"bookingId1\",\n\t\"city\": \"blore\",\n\t\"bookId\": \"book1\"\n    }\n}"
+						},
+						"description": "Get all computations under a tenant"
+					},
+					"response": []
+				},
+				{
+					"name": "Get computation by Id within tenant",
+					"request": {
+						"url": "localhost:18000/v1/computations/{tenant}/id/{id}",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"id\": \"75cc56e6-6b72-44f3-8db5-45f55b5d5dc4\",\n    \"metadata\": {\n        \"timestamp\": 1477473295342,\n        \"schema\": \"book_joiner\",\n        \"schemaVersion\": 1,\n        \"type\": \"EVENT\",\n        \"routingKey\": {\n            \"type\": \"simple\",\n            \"value\": \"1477473295342\"\n        },\n        \"lookupKey\": null,\n        \"tenant\": \"joiner\",\n        \"stream\": \"book_joiner\",\n        \"sender\": null\n    },\n    \"data\": {\n\t\"bookingId\": \"bookingId1\",\n\t\"city\": \"blore\",\n\t\"bookId\": \"book1\"\n    }\n}"
+						},
+						"description": "Get computation by Id within tenant"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete computation by ID within tenant",
+					"request": {
+						"url": "localhost:18000/v1/computations/{tenant}/{id}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-User",
+								"value": "user",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"id\": \"75cc56e6-6b72-44f3-8db5-45f55b5d5dc4\",\n    \"metadata\": {\n        \"timestamp\": 1477473295342,\n        \"schema\": \"book_joiner\",\n        \"schemaVersion\": 1,\n        \"type\": \"EVENT\",\n        \"routingKey\": {\n            \"type\": \"simple\",\n            \"value\": \"1477473295342\"\n        },\n        \"lookupKey\": null,\n        \"tenant\": \"joiner\",\n        \"stream\": \"book_joiner\",\n        \"sender\": null\n    },\n    \"data\": {\n\t\"bookingId\": \"bookingId1\",\n\t\"city\": \"blore\",\n\t\"bookId\": \"book1\"\n    }\n}"
+						},
+						"description": "delete computation by ID within tenant"
+					},
+					"response": []
+				},
+				{
+					"name": "Get latest computation by name within tenant",
+					"request": {
+						"url": "localhost:18000/v1/computations/{tenant}/{name}",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"id\": \"75cc56e6-6b72-44f3-8db5-45f55b5d5dc4\",\n    \"metadata\": {\n        \"timestamp\": 1477473295342,\n        \"schema\": \"book_joiner\",\n        \"schemaVersion\": 1,\n        \"type\": \"EVENT\",\n        \"routingKey\": {\n            \"type\": \"simple\",\n            \"value\": \"1477473295342\"\n        },\n        \"lookupKey\": null,\n        \"tenant\": \"joiner\",\n        \"stream\": \"book_joiner\",\n        \"sender\": null\n    },\n    \"data\": {\n\t\"bookingId\": \"bookingId1\",\n\t\"city\": \"blore\",\n\t\"bookId\": \"book1\"\n    }\n}"
+						},
+						"description": "Get latest computation by name within tenant"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
