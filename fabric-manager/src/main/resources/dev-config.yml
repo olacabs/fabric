@@ -1,0 +1,79 @@
+
+#Copyright 2016 ANI Technologies Pvt. Ltd.
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing, software
+#distributed under the License is distributed on an "AS IS" BASIS,
+#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#See the License for the specific language governing permissions and
+#limitations under the License.
+
+server:
+  type: simple
+  applicationContextPath: /
+  adminContextPath: /admin
+  minThreads: 100
+  maxThreads: 100
+  connector:
+    port: 18000
+    type: http
+
+fabricServerConnectionString: localhost:18000
+artifactoryPath: http://localhost:8080/artifactory
+marathonEndpoint: http://localhost:8080/
+
+executor:
+  minCpu: 0.5
+  minMemory: 1024.0
+  alpha: 0.5
+  executorDockerImage: localhost:9002/fabric-executor:0.0.1
+
+opentsdb:
+  enabled: false
+  openTsdbUrl: "localhost:4242"
+  appName: "fabric-manager"
+  namespace: "fabric"
+  platform: ""
+  periodInSeconds: 30
+
+serviceDiscovery:
+  zkConnectionString: localhost:2181
+  serviceName: fabric-manager
+  namespace: fabric
+  environment: dev
+  hostname: localhost
+  port: 18000
+
+logging:
+  level: INFO
+  loggers:
+      org.hibernate: ERROR
+  appenders:
+    - type: console
+      threshold: ALL
+      timeZone: UTC
+      logFormat: "fabric-manager %d [%thread] %-5level %c{15} - [%X{X-Transaction-Key} - %X{X-Request-Key}] - %msg%n%rEx"
+
+database:
+  driverClass: com.mysql.jdbc.Driver
+  user: root
+  password:
+  url: jdbc:mysql://localhost:3306/fabric_manager_local?autoReconnect=true
+  maxWaitForConnection: 1s
+  validationQuery: "SELECT 1"
+  minSize: 8
+  maxSize: 32
+  checkConnectionWhileIdle: false
+  properties:
+    charSet: UTF-8
+    hibernate.dialect: org.hibernate.dialect.MySQLDialect
+    hibernate.hbm2ddl.auto: update
+    hibernate.show_sql: false
+
+swagger:
+  resourcePackage: com.olacabs.fabric.manager.resource

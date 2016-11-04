@@ -1,0 +1,77 @@
+#Copyright 2016 ANI Technologies Pvt. Ltd.
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing, software
+#distributed under the License is distributed on an "AS IS" BASIS,
+#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#See the License for the specific language governing permissions and
+#limitations under the License.
+
+server:
+  type: simple
+  applicationContextPath: /
+  adminContextPath: /admin
+  minThreads: 100
+  maxThreads: 100
+  connector:
+    port: 18000
+    type: http
+
+fabricManagerConnectionString: ${FABRIC_MANAGER_CONNECTION_STRING}
+artifactoryPath: ${ARTIFACTORY_URL}
+marathonEndpoint: ${MARATHON_ENDPOINT}
+
+executor:
+  minCpu: ${MIN_CPU}
+  minMemory: ${MIN_MEMORY}
+  alpha: ${ALPHA}
+  executorDockerImage: ${EXECUTOR_DOCKER_IMAGE}
+
+opentsdb:
+  enabled: ${METRICS_ENABLED}
+  openTsdbUrl: ${OPENTSDB_URL}
+  appName: ${OPENTSDB_APP_NAME}
+  namespace: ${OPENTSDB_NAMESPACE}
+  platform: ${OPENTSDB_PLATFORM}
+  periodInSeconds: ${OPENTSDB_PERIOD_IN_SEC}
+
+serviceDiscovery:
+  zkConnectionString: ${ZK_CONNECTION_STRING}
+  serviceName: ${SERVICE_NAME}
+  namespace: ${SERVICE_NAMESPACE}
+  environment: ${SERVICE_ENV}
+  hostname: ${HOST}
+  port: ${PORT_18000}
+
+logging:
+  level: ${LOG_LEVEL}
+  loggers:
+      org.hibernate: ${HIBERNATE_LOG_LEVEL}
+  appenders:
+    - type: console
+      threshold: ALL
+      timeZone: UTC
+      logFormat: "fabric-manager %d [%thread] %-5level %c{15} - [%X{X-Transaction-Key} - %X{X-Request-Key}] - %msg%n%rEx"
+
+database:
+  driverClass: com.mysql.jdbc.Driver
+  user: ${DB_USER}
+  password: ${DB_PASSWORD}
+  url: ${DB_URL}
+  maxWaitForConnection: ${DB_MAX_WAIT_FOR_CONNECTION}
+  validationQuery: "SELECT 1"
+  minSize: ${DB_MIN_SIZE}
+  maxSize: ${DB_MAX_SIZE}
+  checkConnectionWhileIdle: ${DB_CHECK_CONNECTION_WHILE_IDLE}
+  properties:
+    charSet: UTF-8
+    hibernate.dialect: org.hibernate.dialect.MySQLDialect
+    hibernate.show_sql: ${DB_SHOW_SQL}
+
+swagger:
+  resourcePackage: com.olacabs.fabric.manager.resource
