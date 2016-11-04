@@ -107,10 +107,10 @@
         <!-- defaults to sun.* packages -->
         <module name="RedundantImport"/>
         <module name="UnusedImports"/>
-        <module name="AvoidStarImport">
-            <property name="allowClassImports" value="false"/>
-            <property name="excludes" value="java.io,java.net,java.lang.Math,java.util"/>
-        </module>
+        <!--<module name="AvoidStarImport">-->
+            <!--<property name="allowClassImports" value="false"/>-->
+            <!--<property name="excludes" value="java.io,java.net,java.lang.Math,java.util"/>-->
+        <!--</module>-->
 
 
         <!-- Checks for Size Violations.                    -->
