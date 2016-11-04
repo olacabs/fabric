@@ -23,6 +23,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.olacabs.fabric.manager.bean.ExecutorConfig;
 import com.olacabs.fabric.manager.bean.RuntimeOptions;
 
+import com.olacabs.fabric.manager.converter.ExecutorConfigConverter;
+import com.olacabs.fabric.manager.converter.RuntimeOptionsConverter;
 import lombok.*;
 
 /**
@@ -45,10 +47,10 @@ public class ApplicationDomain extends TenantBaseDomain {
     @JoinColumn(name = "computationId")
     private ComputationDomain computation;
 
-//    @Convert(converter = ExecutorConfigConverter.class)
+    @Convert(converter = ExecutorConfigConverter.class)
     private ExecutorConfig executorConfig;
 
-//    @Convert(converter = RuntimeOptionsConverter.class)
+    @Convert(converter = RuntimeOptionsConverter.class)
     private RuntimeOptions runtimeOptions;
 
     private Boolean active = true;

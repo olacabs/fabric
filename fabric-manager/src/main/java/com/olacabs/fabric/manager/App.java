@@ -28,6 +28,7 @@ import com.olacabs.fabric.manager.dao.impl.ComponentDAO;
 import com.olacabs.fabric.manager.dao.impl.ComputationDAO;
 import com.olacabs.fabric.manager.dao.impl.GlobalPropertyDAO;
 import com.olacabs.fabric.manager.domain.*;
+import com.olacabs.fabric.manager.exception.mapper.HttpExceptionMapper;
 import com.olacabs.fabric.manager.exception.mapper.RuntimeExceptionMapper;
 import com.olacabs.fabric.manager.filter.UserFilter;
 import com.olacabs.fabric.manager.managed.OpenTsdbMetricReporter;
@@ -137,7 +138,7 @@ public class App extends Application<ManagerConfig> {
         environment.jersey().register(globalPropertyResource);
 
         environment.jersey().register(RuntimeExceptionMapper.class);
-//        environment.jersey().register(HttpExceptionMapper.class);
+        environment.jersey().register(HttpExceptionMapper.class);
 
         environment.jersey().register(UserFilter.class);
     }
