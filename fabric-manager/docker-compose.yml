@@ -1,0 +1,93 @@
+#Copyright 2016 ANI Technologies Pvt. Ltd.
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing, software
+#distributed under the License is distributed on an "AS IS" BASIS,
+#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#See the License for the specific language governing permissions and
+#limitations under the License.
+
+# Zookeeper compose
+zookeeper:
+  image: garland/zookeeper
+  ports:
+   - "2181:2181"
+   - "2888:2888"
+   - "3888:3888"
+
+# MySQL compose
+mysql:
+  image: mysql/mysql-server:latest
+  environment:
+   - MYSQL_ROOT_PASSWORD=password
+   - MYSQL_DATABASE=fabric_manager
+  ports:
+   - "3306:3306"
+
+# Artifactory compose
+artifactory:
+  image: mattgruter/artifactory
+  ports:
+   - "8080:8080"
+
+# OpenTSDB compose
+opentsdb:
+  image: petergrace/opentsdb-docker:latest
+  ports:
+   - "4242:4242"
+   - "60030:60030"
+
+# Fabric-Manager compose
+fabricmanager:
+  build: .
+  ports:
+    - "18000:18000"
+  volumes:
+    - /var/log/fabricmanager
+  # link to zk, artifact, es
+  links:
+    - zookeeper
+    - mysql
+    - artifactory
+    - opentsdb
+  # enviroment valiables
+  environment:
+    - FABRIC_MANAGER_CONNECTION_STRING=_fabric-manager._tcp.marathon.mesos.
+    - ARTIFACTORY_URL=http://artifactory:8080/artifactory
+    - MARATHON_ENDPOINT=http://localhost:8080/
+    - MIN_CPU=0.5
+    - MIN_MEMORY=512
+    - ALPHA=0.5
+    - EXECUTOR_DOCKER_IMAGE=localhost:9002/fabric-executor:0.0.1
+    - METRICS_ENABLED=false
+    - OPENTSDB_URL=opentsdb:4242
+    - OPENTSDB_APP_NAME=fabric-manager
+    - OPENTSDB_NAMESPACE=fabric
+    - OPENTSDB_PLATFORM=fabric
+    - OPENTSDB_PERIOD_IN_SEC=30
+    - ZK_CONNECTION_STRING=zookeeper:2181
+    - SERVICE_NAME=fabric-manager
+    - SERVICE_NAMESPACE=fabric
+    - SERVICE_ENV=dcos
+    - HOST=192.168.99.100
+    - PORT_18000=18000
+    - LOG_LEVEL=INFO
+    - HIBERNATE_LOG_LEVEL=ERROR
+    - DB_USER=root
+    - DB_PASSWORD=password
+    - DB_URL=jdbc:mysql://mysql:3306/fabric_manager?autoReconnect=true
+    - DB_MAX_WAIT_FOR_CONNECTION=1s
+    - DB_MIN_SIZE=8
+    - DB_MAX_SIZE=32
+    - DB_CHECK_CONNECTION_WHILE_IDLE=false
+    - DB_AUTO_EXPORT_DDL_TO_DATABASE=update
+    - DB_SHOW_SQL=false
+    - GC_ALGO=UseG1GC
+    - JAVA_PROCESS_MIN_HEAP=1g
+    - JAVA_PROCESS_MAX_HEAP=1g
+    - CONFIG_ENV=docker-compose
