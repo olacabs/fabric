@@ -1,0 +1,26 @@
+{
+  "testMatchFilter": {
+    "numberFIELD": 24,
+    "booleanFIELD": true,
+    "arrayField": [
+      "a",
+      "b",
+      "c"
+    ],
+    "stringField": "bbb",
+    "objectField": {
+      "abc": "abc"
+    },
+    "anotherNumberFIELD": 24,
+    "anotherFIELD": true,
+    "anotherArrayField": [
+      "a",
+      "b",
+      "c"
+    ],
+    "anotherStringField": "ccc",
+    "anotherObjectField": {
+      "abc": "abc"
+    }
+  }
+}

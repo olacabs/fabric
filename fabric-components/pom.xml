@@ -32,6 +32,7 @@
         <module>kafka-source</module>
         <module>kafka-writer</module>
         <module>http-writer</module>
+        <module>filter-processor</module>
     </modules>
 
 
