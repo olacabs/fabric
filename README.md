@@ -343,8 +343,6 @@ End to end latency to process all messages in seconds (ceiling) averaged over mu
 
 Throughput with best configuration T ~ 166666 events / second<br>
 
-NOTE: Using Disruptor with YieldWaitingStategy instead of LBQ for channel communication actually reduced the throughput<br>
-=======
 NOTE: Using Disruptor with YieldWaitingStrategy instead of LBQ for channel communication actually reduced the throughput<br>
 
 ###Using Processor Maven Archetype
