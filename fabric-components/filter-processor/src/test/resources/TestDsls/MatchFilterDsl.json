@@ -1,0 +1,38 @@
+{
+  "filter": {
+    "filter_type": "bool",
+    "must": [
+      {
+        "filter_type": "match",
+        "field": "$.testMatchFilter.numberFIELD",
+        "value": 24
+      },
+      {
+        "filter_type": "match",
+        "field": "$.testMatchFilter.booleanFIELD",
+        "value": true
+      },
+      {
+        "filter_type": "match",
+        "field": "$.testMatchFilter.arrayField",
+        "value": [
+          "a",
+          "b",
+          "c"
+        ]
+      },
+      {
+        "filter_type": "match",
+        "field": "$.testMatchFilter.stringField",
+        "value": "bbb"
+      },
+      {
+        "filter_type": "match",
+        "field": "$.testMatchFilter.objectField",
+        "value": {
+          "abc": "abc"
+        }
+      }
+    ]
+  }
+}
