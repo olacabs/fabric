@@ -1,0 +1,47 @@
+{
+  "filter": {
+    "filter_type": "bool",
+    "must": [
+      {
+        "filter_type": "compare",
+        "field1": "$.testMatchFilter.numberFIELD",
+        "constant": 24,
+        "comparison_operator": "eq"
+      },
+      {
+        "filter_type": "compare",
+        "field1": "$.testMatchFilter.numberFIELD",
+        "field2": "$.testMatchFilter.anotherNumberFIELD",
+        "comparison_operator": "eq"
+      }
+    ],
+    "should": [
+      {
+        "filter_type": "compare",
+        "field1": "$.testMatchFilter.numberFIELD",
+        "constant": 24,
+        "comparison_operator": "eq"
+      },
+      {
+        "filter_type": "compare",
+        "field1": "$.testMatchFilter.numberFIELD",
+        "constant": 24,
+        "comparison_operator": "gt"
+      }
+    ],
+    "must_not": [
+      {
+        "filter_type": "compare",
+        "field1": "$.testMatchFilter.numberFIELD",
+        "constant": 24,
+        "comparison_operator": "lt"
+      },
+      {
+        "filter_type": "compare",
+        "field1": "$.testMatchFilter.numberFIELD",
+        "constant": 24,
+        "comparison_operator": "gt"
+      }
+    ]
+  }
+}
