@@ -16,13 +16,6 @@
 
 package com.olacabs.fabric.jsonfilter.processors.filters;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Properties;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang.StringUtils;
-
 import com.olacabs.fabric.compute.ProcessingContext;
 import com.olacabs.fabric.compute.processor.InitializationException;
 import com.olacabs.fabric.compute.processor.ProcessingException;
@@ -35,16 +28,21 @@ import com.olacabs.fabric.model.event.Event;
 import com.olacabs.fabric.model.event.EventSet;
 import com.olacabs.fabric.model.processor.Processor;
 import com.olacabs.fabric.model.processor.ProcessorType;
-
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.stream.Collectors;
 
 /**
  * TODO Add Javadoc.
  */
-@Processor(namespace = "global", name = "json-filter-processor", version = "0.0.2",
+@Processor(namespace = "global", name = "json-filter-processor", version = "1.0.0",
         description = "A processor that filters json events",
-        cpu = 0.1, memory = 1, processorType = ProcessorType.EVENT_DRIVEN, requiredProperties = { "filterDsl" })
+        cpu = 0.1, memory = 128, processorType = ProcessorType.EVENT_DRIVEN, requiredProperties = {"filterDsl"})
 @Slf4j
 @Setter
 public class JsonFilterProcessor extends StreamingProcessor {
@@ -59,7 +57,7 @@ public class JsonFilterProcessor extends StreamingProcessor {
                 globalProperties, "filterDsl", instanceId, componentMetadata);
 
         if (null != filterDsl && StringUtils.isEmpty(filterDsl)) {
-            throw new RuntimeException("required Properties not found instanceId");
+            throw new InitializationException("required Properties not found instanceId");
         }
 
         try {
@@ -69,16 +67,14 @@ public class JsonFilterProcessor extends StreamingProcessor {
             log.error(e.getMessage()
                     + " unable to initialize processor instanceId: "
                     + instanceId);
-            throw new RuntimeException(e);
+            throw new InitializationException(e);
         }
 
     }
 
     @Override
     protected EventSet consume(ProcessingContext context, EventSet eventSet) throws ProcessingException {
-
-        List<Event> events;
-        events = eventSet
+        List<Event> events = eventSet
                 .getEvents()
                 .parallelStream()
                 .filter(Objects::nonNull)
@@ -92,5 +88,4 @@ public class JsonFilterProcessor extends StreamingProcessor {
     public void destroy() {
 
     }
-
 }

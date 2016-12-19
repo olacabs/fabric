@@ -18,7 +18,6 @@ package com.olacabs.fabric.jsonfilter.impl;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jayway.jsonpath.JsonPath;
-
 import com.olacabs.fabric.jsonfilter.Filter;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -65,16 +64,13 @@ public class CompareFilter implements Filter {
             Object rhsValue = getRHS(document);
             return evaluate(lhsValue, rhsValue, comparisonOperator);
         } catch (Exception exception) {
-            log.debug(exception.getMessage());
-            System.err.println(exception.getMessage());
+            log.error("Error - {}", exception.getMessage(), exception);
         }
-
         return false;
     }
 
     private boolean evaluate(Comparable<Object> lhsValue, Object rhsValue, String comparisonOperatorLocal) {
         if (null != rhsValue && null != lhsValue) {
-
             int res = lhsValue.compareTo(rhsValue);
             if (res == 0) {
                 if (comparisonOperatorLocal.equals(LTE)

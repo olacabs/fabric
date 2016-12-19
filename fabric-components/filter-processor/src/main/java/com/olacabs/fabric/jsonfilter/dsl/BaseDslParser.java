@@ -16,10 +16,6 @@
 
 package com.olacabs.fabric.jsonfilter.dsl;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jackson.JsonLoader;
@@ -28,8 +24,11 @@ import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.olacabs.fabric.jsonfilter.Filter;
-
 import lombok.extern.slf4j.Slf4j;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 /**
  * TODO javadoc.
@@ -38,6 +37,8 @@ import lombok.extern.slf4j.Slf4j;
 public final class BaseDslParser implements DslParser {
 
     private static final String SCHEMAFILE = "dslSchema.json";
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private JsonSchema schema = null;
 
@@ -68,19 +69,16 @@ public final class BaseDslParser implements DslParser {
     public Filter parse(String dsl) throws IOException, ProcessingException {
         Filter filter = null;
         if (isValid(dsl)) {
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode jsonNode = mapper.readTree(dsl);
+            JsonNode jsonNode = MAPPER.readTree(dsl);
             jsonNode = jsonNode.at("/filter");
-            filter = mapper.readValue(jsonNode.toString(), Filter.class);
+            filter = MAPPER.readValue(jsonNode.toString(), Filter.class);
         }
         log.debug(filter != null ? filter.toString() : null);
         return filter;
     }
 
     private boolean isValid(String dsl) throws ProcessingException, IOException {
-
         JsonNode jsonNode = JsonLoader.fromString(dsl);
-
         ProcessingReport report;
         report = schema.validate(jsonNode);
 
@@ -95,5 +93,4 @@ public final class BaseDslParser implements DslParser {
         InputStream inputStream = classLoader.getResourceAsStream(SCHEMAFILE);
         return JsonLoader.fromReader(new InputStreamReader(inputStream));
     }
-
 }

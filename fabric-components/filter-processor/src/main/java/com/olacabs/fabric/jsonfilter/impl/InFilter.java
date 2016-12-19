@@ -16,17 +16,16 @@
 
 package com.olacabs.fabric.jsonfilter.impl;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
-
 import com.olacabs.fabric.jsonfilter.Filter;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
 
 /**
  * TODO javadoc.
@@ -53,8 +52,7 @@ public class InFilter implements Filter {
                 return true;
             }
         } catch (Exception exception) {
-            log.debug(exception.getMessage());
-            System.err.println(exception.getMessage());
+            log.error("Exception - {}", exception.getMessage(), exception);
         }
 
         return false;

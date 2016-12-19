@@ -53,7 +53,7 @@ public class MatchFilter implements Filter {
                 return true;
             }
         } catch (Exception exception) {
-            log.debug(exception.getMessage());
+            log.error("Exception - {}", exception.getMessage(), exception);
         }
         return false;
     }

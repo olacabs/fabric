@@ -20,11 +20,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
-
 import com.olacabs.fabric.jsonfilter.Filter;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * TODO javadoc.
@@ -32,6 +32,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Slf4j
 public class ExistFilter implements Filter {
 
     @JsonProperty("field")
@@ -42,7 +43,8 @@ public class ExistFilter implements Filter {
         Object document = Configuration.defaultConfiguration().jsonProvider().parse(json);
         try {
             JsonPath.read(document, this.field);
-        } catch (PathNotFoundException e) {
+        } catch (PathNotFoundException exception) {
+            log.error("Error - {}", exception.getMessage(), exception);
             return false;
         }
         return true;
