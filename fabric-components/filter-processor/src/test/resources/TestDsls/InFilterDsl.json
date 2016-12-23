@@ -1,0 +1,104 @@
+{
+  "filter": {
+    "filter_type": "bool",
+    "must": [
+      {
+        "filter_type": "in",
+        "field": "$.testMatchFilter.numberFIELD",
+        "range": [
+          1,
+          2,
+          3,
+          24,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "filter_type": "in",
+        "field": "$.testMatchFilter.booleanFIELD",
+        "range": [
+          true,
+          false
+        ]
+      },
+      {
+        "filter_type": "in",
+        "field": "$.testMatchFilter.arrayField",
+        "range": [
+          [
+            "a",
+            "b",
+            "c"
+          ],
+          [
+            1,
+            2,
+            3
+          ],
+          []
+        ]
+      },
+      {
+        "filter_type": "in",
+        "field": "$.testMatchFilter.stringField",
+        "range": [
+          "pqr",
+          "abc",
+          "LMN",
+          "bbb"
+        ]
+      },
+      {
+        "filter_type": "in",
+        "field": "$.testMatchFilter.objectField",
+        "range": [
+          {
+            "abc": "abc"
+          },
+          {
+            "": ""
+          }
+        ]
+      }
+    ],
+    "should": [
+      {
+        "filter_type": "in",
+        "field": "$.testMatchFilter.numberFIELD",
+        "range": [
+          1100,
+          1111,
+          22222
+        ]
+      },
+      {
+        "filter_type": "in",
+        "field": "$.testMatchFilter.booleanFIELD",
+        "range": [
+          true,
+          false
+        ]
+      }
+    ],
+    "must_not": [
+      {
+        "filter_type": "in",
+        "field": "$.testMatchFilter.numberFIELD",
+        "range": [
+          1100,
+          1111,
+          22222
+        ]
+      },
+      {
+        "filter_type": "in",
+        "field": "$.testMatchFilter.booleanFIELD",
+        "range": [
+          "true"
+        ]
+      }
+    ]
+  }
+}

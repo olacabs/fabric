@@ -1,0 +1,33 @@
+{
+  "filter": {
+    "filter_type": "bool",
+    "must": [
+      {
+        "filter_type": "exist",
+        "field": "$.testMatchFilter.numberFIELD"
+      },
+      {
+        "filter_type": "exist",
+        "field": "$.testMatchFilter.booleanFIELD"
+      },
+      {
+        "filter_type": "exist",
+        "field": "$.testMatchFilter.arrayField"
+      },
+      {
+        "filter_type": "exist",
+        "field": "$.testMatchFilter.stringField"
+      },
+      {
+        "filter_type": "exist",
+        "field": "$.testMatchFilter.objectField"
+      }
+    ],
+    "must_not": [
+      {
+        "filter_type": "exist",
+        "field": "$.testMatchFilter.noSuchKey"
+      }
+    ]
+  }
+}
