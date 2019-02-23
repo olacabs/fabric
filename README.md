@@ -1,6 +1,6 @@
-##Fabric - A real-time stream processing framework <br>
+## Fabric - A real-time stream processing framework <br>
 
-###What?
+### What?
 A scalable, practical and safe real-time computation framework designed for easy operability and extension.<br>
 
 Fabric is proven to work very well for:<br>
@@ -10,7 +10,7 @@ Fabric is proven to work very well for:<br>
 - Real-time pattern matching<br>
 - Basic Streaming analytics<br>
 
-###Why?
+### Why?
 * Highly scalable and guaranteed availability using battle-tested clustering capabilities provided by Apache Mesos and Marathon
 * Framework level guarantees against message loss, support for replay, multiple sources and complex tuple trees.
 * Event batching is supported at the core level.
@@ -37,14 +37,14 @@ Fabric is proven to work very well for:<br>
 **Streaming Processor**: A Streaming Processor is a processor that is triggered whenever and event set is sent to the processor.<br>
 **Scheduled Processor**: A Scheduled Processor is a processor which is triggered whenever a fixed period of time elapses in a periodic fashion.<br>
 
-###Walkthrough<br>
+### Walkthrough <br>
 Let’s write a word count computation that processes a list of sentences and outputs words frequency counts.<br>
 We need three components for this computation:<br>
 1. A source that generates random sentences - RandomSentenceSource<br>
 2. A processor that splits the sentences by space into its constituent words - SplitterProcessor<br>
 3. A processor that outputs the word frequency counts at regular intervals - WordCountProcessor<br>
 
-####RandomSentenceSource.java
+#### RandomSentenceSource.java
 ```
 // Add this annotation for registering the source with the metadata server
 @Source(
@@ -105,7 +105,7 @@ public class RandomSentenceSource implements PipelineSource {
 }
 ```
 
-####SplitterProcessor.java
+#### SplitterProcessor.java
 ```
 @Processor(
         namespace = "global",
@@ -158,7 +158,7 @@ public class SplitterProcessor extends StreamingProcessor {
 }
 ```
 
-####WordCountProcessor.java
+#### WordCountProcessor.java
 ```
 @Processor(
         namespace = "global",
@@ -314,11 +314,11 @@ The json specification for this computation will look like this<br>
 }
 ```
 
-###Benchmarks
-####Performance Test Configuration
+### Benchmarks
+#### Performance Test Configuration
 No of messages: 1 million<br>
 Payload size: 258 bytes<br>
-####Topology
+#### Topology
 Kafka Source -> Event Counter (Prints number of total events consumed every one second to the console)<br>
 No of partitions: 1<br>
 Topic Name: end-to-end-latency-perf<br>
@@ -327,9 +327,9 @@ Kafka source buffer size: 3 MB<br>
 Docker CPU (number of cpu shares): 1.0<br>
 Docker Memory: 2 GB<br>
 JVM Heap Size: 2 GB<br>
-####Kafka Broker configuration
+#### Kafka Broker configuration
 2 cores Intel(R) Xeon(R) CPU E5-2666 v3 @ 2.90GHz 8 GB RAM<br>
-####Mesos Host configuration
+#### Mesos Host configuration
 8 cores Intel(R) Xeon(R) CPU E5-2666 v3 @ 2.90GHz 32 GB RAM<br>
 
 End to end latency to process all messages in seconds (ceiling) averaged over multiple runs is presented below<br><br>
@@ -345,7 +345,7 @@ Throughput with best configuration T ~ 166666 events / second<br>
 
 NOTE: Using Disruptor with YieldWaitingStrategy instead of LBQ for channel communication actually reduced the throughput<br>
 
-###Using Processor Maven Archetype
+### Using Processor Maven Archetype
 
 To create a processor project, please run following command - 
 
