@@ -155,7 +155,7 @@
             </snapshots>
             <id>bintray-readytalk-maven</id>
             <name>bintray</name>
-            <url>http://dl.bintray.com/readytalk/maven</url>
+            <url>https://dl.bintray.com/readytalk/maven</url>
         </repository>
     </repositories>
     <pluginRepositories>
@@ -165,7 +165,7 @@
             </snapshots>
             <id>bintray-readytalk-maven</id>
             <name>bintray-plugins</name>
-            <url>http://dl.bintray.com/readytalk/maven</url>
+            <url>https://dl.bintray.com/readytalk/maven</url>
         </pluginRepository>
     </pluginRepositories>
 
