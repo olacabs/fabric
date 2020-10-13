@@ -78,7 +78,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <lombok.version>1.16.6</lombok.version>
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13.1</junit.version>
         <dropwizard.version>0.8.4</dropwizard.version>
     </properties>
 
