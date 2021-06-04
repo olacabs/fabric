@@ -32,7 +32,7 @@
         <metrics-aspectj.version>1.0.0</metrics-aspectj.version>
         <aspectjrt.version>1.8.2</aspectjrt.version>
         <javax.el.version>3.0.0</javax.el.version>
-        <httpclient.version>4.5</httpclient.version>
+        <httpclient.version>4.5.13</httpclient.version>
         <reflections.version>0.9.9-RC2</reflections.version>
         <jfrog.version>0.16</jfrog.version>
         <jackson-dataformat.version>2.5.1</jackson-dataformat.version>
