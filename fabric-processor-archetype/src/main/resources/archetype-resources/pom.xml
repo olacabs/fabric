@@ -27,7 +27,7 @@
         <lombok.version>1.16.6</lombok.version>
         <fabric.ingestion.version>0.0.5</fabric.ingestion.version>
         <fabric.version>0.4.11</fabric.version>
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13.1</junit.version>
     </properties>
 
     <dependencies>
