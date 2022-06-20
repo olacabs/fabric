@@ -29,7 +29,7 @@
     <properties>
         <jackson-annotations.version>2.5.1</jackson-annotations.version>
         <validation.version>1.0.0.GA</validation.version>
-        <hibernate-validator.version>5.2.3.Final</hibernate-validator.version>
+        <hibernate-validator.version>5.3.6.Final</hibernate-validator.version>
     </properties>
 
     <dependencies>
