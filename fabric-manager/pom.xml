@@ -44,7 +44,7 @@
         <ranger.version>0.2.1</ranger.version>
         <hibernate-jpa.version>1.0.0.Final</hibernate-jpa.version>
         <hibernate.version>4.3.10.Final</hibernate.version>
-        <mysql.connector.version>8.0.16</mysql.connector.version>
+        <mysql.connector.version>8.0.28</mysql.connector.version>
         <cp30.version>0.9.1.2</cp30.version>
         <mockito.version>1.9.5</mockito.version>
         <jackson.version>2.5.3</jackson.version>
